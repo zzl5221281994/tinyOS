@@ -1,7 +1,5 @@
 		ORG		0x7c00
 		JMP		entry
-
-; プログラム云悶
 entry:
 		MOV		AX,0			
 		MOV		SS,AX
