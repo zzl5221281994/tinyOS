@@ -10,7 +10,7 @@
 ;set Cylinder,head,sector and AL=1(number of sector)
 %macro setCHS 4                     
 	   MOV 	CH,(%1 & 0X00FF)
-	   MOV	CL,(%3) | (%1 & (0X0300>>2))
+	   MOV	CL,(%3) | ((%1&0X0300)>>2)
 	   MOV	DH,%2
 	   MOV	DL,0
 	   MOV	AL,%4
@@ -23,3 +23,9 @@
 	   MOV	BX,%2
 %endmacro
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;100=1100100
+;MOV	CH,100D
+;MOV	CL,0
+;MOV	DH,0
+;MOV	DL,0
+;MOV	AL,1

@@ -3,7 +3,7 @@
 		JMP		entry
 entry:
 		setReadBuff 0x07e0,0x0000     ;setReadBuff
-		setCHS  0,0,3,1				  ;setCHS Cylinder,head,sector,sector number
+		setCHS  0d,0,2d,1				  ;setCHS Cylinder,head,sector,sector number
 		MOV		AH,2
 		INT 	13H
 		JC		err
@@ -19,6 +19,6 @@ err:
 		mov		dl,0
 		int 10h
 		jmp     $
-message2: db "read sector error!(C=0,H=0,S=2)"
+message2: db "read sector error!(C=0,H=0,S=0)"
 		times	510d-($-$$) DB 0			
 		DB		0x55, 0xaa

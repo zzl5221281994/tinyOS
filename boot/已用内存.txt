@@ -1,0 +1,39 @@
+0x7c00开始的512字节用于启动扇区
+0x7e00开始用于loader,保护模式，画面模式，内存分布相关设置
+MOV		AX,0x9000
+		MOV		ES,AX
+		MOV		DI,0
+		MOV		AX,0x4f00
+		INT		0x10
+		CMP		AX,0x004f
+		JNE		scrn320
+
+
+		MOV		AX,[ES:DI+4]
+		CMP		AX,0x0200
+		JB		scrn320			; if (AX < 0x0200) goto scrn320
+
+		MOV		CX,0x105
+		MOV		AX,0x4f01
+		INT		0x10
+		CMP		AX,0x004f
+		JNE		scrn320
+
+		CMP		BYTE [ES:DI+0x19],8
+		JNE		scrn320
+		CMP		BYTE [ES:DI+0x1b],4
+		JNE		scrn320
+		MOV		AX,[ES:DI+0x00]
+		AND		AX,0x0080
+		JZ		scrn320	
+		MOV		EAX,[ES:DI+0x28]            ;设置视频段基地址
+		MOV		WORD [LABEL_DESC_VIDEO+2],AX
+		SHR		EAX,16D
+		MOV		BYTE [LABEL_DESC_VIDEO+4],AL
+		MOV     BYTE [LABEL_DESC_VIDEO+7],AH
+		
+
+		MOV		BX,0x4105
+		MOV		AX,0x4f02
+		INT		0x10
+		JMP		SUCCEED
