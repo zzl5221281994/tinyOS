@@ -16,7 +16,7 @@
 ;
 ;
 ;
-;
+;存储段描述符属性
 SegDesc_Property_4KB  			EQU		8000H  ;4KB粒度
 SegDesc_Property_32				EQU		4000H  ;32位段
 
@@ -24,7 +24,7 @@ SegDesc_Property_DPL0			EQU		0000H  ;DPL：特权级=0
 SegDesc_Property_DPL1			EQU		0020H  ;DPL：特权级=1
 SegDesc_Property_DPL2			EQU		0040H  ;DPL：特权级=2
 SegDesc_Property_DPL3			EQU     0060H  ;DPL：特权级=3
-;存储段描述符属性
+
 SegDesc_Property_R 				EQU		0090H  ;存在的只读数据段	
 SegDesc_Property_RW				EQU		0092H  ;存在的可读写数据段
 SegDesc_Property_RWA			EQU     0093H  ;存在的已访问可读写数据段	
@@ -40,5 +40,5 @@ SegDesc_Property_386CGate		EQU		008CH  ;386调用门段
 SegDesc_Property_386IGate		EQU		008EH  ;386中断门段
 SegDesc_Property_TGate			EQU		008FH  ;386陷阱门段
 
-
+KERNEL_SIZE						EQU		1
 ;内存分布图数据结构入口

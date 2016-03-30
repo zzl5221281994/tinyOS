@@ -23,6 +23,11 @@
 	   MOV	BX,%2
 %endmacro
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+%macro setMcpySrcDescNum 3
+	   MOV	ESI,%1
+	   MOV	EDI,%2
+	   MOV	ECX,%3
+%endmacro
 ;100=1100100
 ;MOV	CH,100D
 ;MOV	CL,0

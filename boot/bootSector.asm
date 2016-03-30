@@ -7,6 +7,11 @@ entry:
 		MOV		AH,2
 		INT 	13H
 		JC		err
+		setReadBuff 0x0800,0x0000
+		setCHS  0d,0,3d,1
+		MOV		AH,2
+		INT 	13H
+		JC		err
 		JMP     0x7e00
 err:
 		MOV		AX,CS
