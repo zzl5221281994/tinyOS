@@ -2,15 +2,15 @@
 		MOV  	ES,AX
 		MOV		EDI,0x14
         MOV		EBX,0
+		MOV		ESI,0             ;计数内存段个数
 LOOP1:  MOV		ECX,0020D
 		MOV		EDX,0X534D4150
 		MOV		EAX,0XE820
-		MOV		ESI,0
 
 		INT 	15H
+		JC		FIN
 		INC  	ESI
 		ADD		EDI,0X14
-		JC		FIN
 		CMP		EBX,0
 		JE		FIN
 		JMP  	LOOP1

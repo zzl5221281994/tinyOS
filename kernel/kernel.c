@@ -1,31 +1,37 @@
+/************************************************************************************
+Wed Mar 30 22:50:57 2016
+
+MIT License
+Copyright (c) 2016 zhuzuolang
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+************************************************************************************/
+
 extern void io_hlt(void);
 extern void write(int i,char color);
-char* str1="qwertyuiop";
-char* str2="asdfghjkl";
-struct rect{
-	int leftX;
-	int leftY;
-	int lenX;
-	int lenY;
-	char color;
-};
+static char* str1="qwertyuiop";
+static char* str2="asdfghjkl";
 void HariMain(void)
 {
 	int i,j;
-	//struct rect r1={100,100,50,50,0x1f};
-	/*r1.leftX=100;
-	r1.leftY=100;
-	r1.lenX=50;
-	r1.lenY=50;
-	r1.color=0x1f;
-	//write(r1.leftX*1024+r1.leftY,0x1f);*/
-	for(i=50;i<100;i++)
-		for(j=50;j<100;j++)
-			write(1024*i+j,0x3c);
-	/*for(i=r1.leftX;i<r1.leftX+r1.lenY;i++)
-		for(j=r1.leftY;j<r1.leftY+r1.lenX;j++)
-			write(1024*i+j,r1.color);*/
-	
+	for(i=0;i<16;i++)
+		for(j=0;j<8;j++)
+			if(str1[0]=='q'&&str2[1]=='s')
+				write(1024*i+j,0x1f);
 	while(1)
 		io_hlt();
 }
