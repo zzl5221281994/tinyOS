@@ -30,7 +30,7 @@ org 0x7e00
 KERNEL_SEG_BASE		EQU		0X200000
 VIDEO_SEG_BASE		EQU		0X0A0000
 STACK_SEG_BASE		EQU		0X000000
-DATA_SEG_BASE		EQU 	0X000000
+DATA_SEG_BASE		EQU     0X000000
 ;
 ;EndFunctionBlock		各段基地址
 
@@ -122,12 +122,12 @@ SUCCEED:
 		;MOV     BYTE [LABEL_DESC_CODE32+7],AH
 		
 		;BeginFunctionBlock		载入GDT,打开地址线A20，连续的地址空间
-		XOR 	EAX,EAX
+		XOR     EAX,EAX
 		MOV		AX, CS
 		SHL		EAX,4D
-		ADD 	EAX,LABEL_GDT
-		MOV 	DWORD[GdtPtr+2],EAX
-		LGDT   [GdtPtr]
+		ADD     EAX,LABEL_GDT
+		MOV     DWORD[GdtPtr+2],EAX
+		LGDT    [GdtPtr]
 		CLI
 		IN		AL,92H
 		OR		AL,00000010B
@@ -142,7 +142,7 @@ SUCCEED:
 		JMP     pipelineflush
 pipelineflush:
 		MOV		AX,SelectorVideo
-		MOV 	GS,AX
+		MOV     GS,AX
 		MOV		AX,SelectorStack
 		MOV		SS,AX
 		MOV		ESP,0x1FFFFC
