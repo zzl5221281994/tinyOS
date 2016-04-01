@@ -16,9 +16,9 @@
 #define sign_NUMBER                     10
 #define fontRect_WIDTH                  8
 #define fontRect_HEIGHT                 16
-typedef static struct{
+static struct fontRect{
 	unsigned char bitMap[16];
-}fontRect;
+};
 /*数字，大小写字母，符号，符号的查找表，以及一个特殊符号（表示错误字符）*/
 static struct fontRect                          numberFont[10];
 static struct fontRect                       charLowerFont[26];
@@ -27,18 +27,32 @@ static struct fontRect                   signFont[sign_NUMBER];
 static struct fontRect                             specialChar;
 static char                         signFontTable[sign_NUMBER];
 static void   drawFont(int type,	int leftX,int leftY,int foreGroundColor,int backGroundColor,int offset                                  );
-       //void   drawChar(char c,      int leftX,int leftY,int foreGroundColor,int backGroundColor                                     	    );
        void   drawStr (char*str,    int leftX,int leftY,int foreGroundColor,int backGroundColor	                                            );
        void   drawNum (int num,     int leftX,int leftY,int foreGroundColor,int backGroundColor	                                            );
-
-
-
-
-
+/////////////////////////////////////////////////
+extern void write      (int i,char color);
+extern int zzlOS_strlen(char*str        );
+////////////////////////test
+/*numberFont[0].bitMap[0]=0x00;
+numberFont[0].bitMap[1]=0x18;
+numberFont[0].bitMap[2]=0x24;
+numberFont[0].bitMap[3]=0x24;
+numberFont[0].bitMap[4]=0x42;
+numberFont[0].bitMap[5]=0x42;
+numberFont[0].bitMap[6]=0x42;
+numberFont[0].bitMap[7]=0x42;
+numberFont[0].bitMap[8]=0x42;
+numberFont[0].bitMap[9]=0x42;
+numberFont[0].bitMap[10]=0x42;
+numberFont[0].bitMap[11]=0x24;
+numberFont[0].bitMap[12]=0x24;
+numberFont[0].bitMap[13]=0x18;
+numberFont[0].bitMap[14]=0x00;
+numberFont[0].bitMap[15]=0x00;*/
 
 	   
 static void   drawFont(int type,	int leftX,int leftY,int foreGroundColor,int backGroundColor,int offset                                  ){
-	struct fontRect*fp=NULL;
+	struct fontRect*fp=0;
 	if(type&type_NUMBER)
 		fp=&numberFont[offset];
 	
@@ -52,11 +66,11 @@ static void   drawFont(int type,	int leftX,int leftY,int foreGroundColor,int bac
 		fp=&signFont[offset];
 	else
 		fp=&specialChar;
-	int i,j;
+	int i;
 		for(i=0;i<16;++i)
 		{
-			unsigned char test=0x80,bit =((*fp)->bitMap)[i];
-			int count=0,              startX=left<<10+leftY;
+			unsigned char test=0x80,bit =(fp->bitMap)[i];
+			int count=0,              startX=((leftX+i)<<10)+leftY;
 			while(test>0)
 			{
 				if(test&bit)
@@ -64,14 +78,43 @@ static void   drawFont(int type,	int leftX,int leftY,int foreGroundColor,int bac
 				else
 					write(startX+count,backGroundColor);
 				count++;
-				test=test>>1;
+				test=(test>>1);
 			}
 		}
 }
-	   void   drawStr (char*str,    int leftX,int leftY,int foreGroundColor,int backGroundColor	                                            )
+void   drawStr (char*str,    int leftX,int leftY,int foreGroundColor,int backGroundColor	                                            )
 	   {
-		   int i,len=strlen(str);
+		   numberFont[0].bitMap[0]=0x00;
+numberFont[0].bitMap[1]=0x18;
+numberFont[0].bitMap[2]=0x24;
+numberFont[0].bitMap[3]=0x24;
+numberFont[0].bitMap[4]=0x42;
+numberFont[0].bitMap[5]=0x42;
+numberFont[0].bitMap[6]=0x42;
+numberFont[0].bitMap[7]=0x42;
+numberFont[0].bitMap[8]=0x42;
+numberFont[0].bitMap[9]=0x42;
+numberFont[0].bitMap[10]=0x42;
+numberFont[0].bitMap[11]=0x24;
+numberFont[0].bitMap[12]=0x24;
+numberFont[0].bitMap[13]=0x18;
+numberFont[0].bitMap[14]=0x00;
+numberFont[0].bitMap[15]=0x00;
+				int i,j;
+				for(i=200;i<208;i++)
+					for(j=200;j<216;j++)
+						write(i*1024+j,0x2e);
+		   int len=zzlOS_strlen(str);
 		   int startX=leftX,startY=leftY;
+		   if(len==2)
+		   {
+			   for(i=100;i<108;i++)
+					for(j=100;j<116;j++)
+						write(i*1024+j,0x3c);
+		   }
+		   for(i=300;i<308;i++)
+					for(j=300;j<316;j++)
+						write(i*1024+j,0x1f);
 		   for(i=0;i<len;++i)
 		   {
 			   if(isDigts(str[i]))
@@ -103,8 +146,9 @@ static void   drawFont(int type,	int leftX,int leftY,int foreGroundColor,int bac
 			   }
 		   }
 	   }
-       void   drawNum (int num,     int leftX,int leftY,int foreGroundColor,int backGroundColor	                                            ){
+void   drawNum (int num,     int leftX,int leftY,int foreGroundColor,int backGroundColor	                                            ){
 	   }
+
 	   
 	   
 	   

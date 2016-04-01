@@ -20,18 +20,17 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ************************************************************************************/
-
+#include "graphics\font.h"
 extern void io_hlt(void);
 extern void write(int i,char color);
-static char* str1="qwertyuiop";
-static char* str2="asdfghjkl";
+static char* str1="000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 void HariMain(void)
 {
 	int i,j;
-	for(i=0;i<16;i++)
-		for(j=0;j<8;j++)
-			if(str1[0]=='q'&&str2[1]=='s')
-				write(1024*i+j,0x1f);
+	for(i=0;i<8;i++)
+		for(j=0;j<16;j++)
+			write(i*1024+j,0x1f);
+	drawStr(str1,0,0,0x1f,0x3c);
 	while(1)
 		io_hlt();
 }
