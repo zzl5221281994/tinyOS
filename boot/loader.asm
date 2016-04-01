@@ -37,11 +37,11 @@ DATA_SEG_BASE		EQU 	0X000000
 
 ;BeginFunctionBlock		GDT
 ;                                    			段基址                段长          属性
-LABEL_GDT        :		Descriptor					0,     		        0,		     0
-LABEL_DESC_CODE32:		Descriptor	  KERNEL_SEG_BASE,             0ffffh,         SegDesc_Property_32 |SegDesc_Property_EXEC_R
-LABEL_DESC_VIDEO :		Descriptor     VIDEO_SEG_BASE,             0ffffh,         SegDesc_Property_RW
+LABEL_GDT        :      Descriptor                  0,                  0,         0
+LABEL_DESC_CODE32:      Descriptor    KERNEL_SEG_BASE,             0ffffh,         SegDesc_Property_32 |SegDesc_Property_EXEC_R
+LABEL_DESC_VIDEO :      Descriptor     VIDEO_SEG_BASE,             0ffffh,         SegDesc_Property_RW
 LABEL_DESC_STACK :      Descriptor     STACK_SEG_BASE,             0ffffh,         SegDesc_Property_32 |SegDesc_Property_4KB|SegDesc_Property_RW
-LABEL_DESC_DATA  :      Descriptor   	DATA_SEG_BASE,             0ffffh,         SegDesc_Property_4KB|SegDesc_Property_RW
+LABEL_DESC_DATA  :      Descriptor      DATA_SEG_BASE,             0ffffh,         SegDesc_Property_4KB|SegDesc_Property_RW
 
 
 GdtLen       equ            $-LABEL_GDT                         ;GDT 长度
@@ -59,10 +59,10 @@ SelectorData       equ         LABEL_DESC_DATA   -LABEL_GDT     ;数据段选择
 
 LABEL_BEGIN:
 		MOV		AX,CS
-		MOV 	DS,AX
+		MOV     DS,AX
 		MOV		ES,AX
 		MOV		SS,AX
-		MOV 	SP,0
+		MOV     SP,0
 
 		;BeginFunctionBlock		设置画面显示模式           1024*768*8bit	
 		MOV		AX,0x9000
