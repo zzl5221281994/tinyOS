@@ -25,7 +25,12 @@
 		JMP		entry
 entry:
 		setReadBuff 0x07e0,0x0000     	  ;setReadBuff
-		setCHS  0d,0,2d,7				  ;setCHS Cylinder,head,sector,sector number
+		setCHS  0d,0,2d,17				  ;setCHS Cylinder,head,sector,sector number
+		MOV		AH,2
+		INT 	13H
+		JC		err
+		setReadBuff 0x0a00,0x0000     	  ;setReadBuff
+		setCHS  0d,1,1d,17				  ;setCHS Cylinder,head,sector,sector number
 		MOV		AH,2
 		INT 	13H
 		JC		err

@@ -30,18 +30,18 @@ org 0x7e00
 KERNEL_SEG_BASE		EQU		0X200000
 VIDEO_SEG_BASE		EQU		0X0A0000
 STACK_SEG_BASE		EQU		0X000000
-DATA_SEG_BASE       EQU     0X000000
+DATA_SEG_BASE		EQU 	0X000000
 ;
 ;EndFunctionBlock		各段基地址
 
 
 ;BeginFunctionBlock		GDT
 ;                                    			段基址                段长          属性
-LABEL_GDT        :      Descriptor                  0,                  0,         0
-LABEL_DESC_CODE32:      Descriptor    KERNEL_SEG_BASE,             0ffffh,         SegDesc_Property_32 |SegDesc_Property_EXEC_R
-LABEL_DESC_VIDEO :      Descriptor     VIDEO_SEG_BASE,             0ffffh,         SegDesc_Property_RW
+LABEL_GDT        :		Descriptor					0,     		        0,		     0
+LABEL_DESC_CODE32:		Descriptor	  KERNEL_SEG_BASE,             0ffffh,         SegDesc_Property_32 |SegDesc_Property_EXEC_R
+LABEL_DESC_VIDEO :		Descriptor     VIDEO_SEG_BASE,             0ffffh,         SegDesc_Property_RW
 LABEL_DESC_STACK :      Descriptor     STACK_SEG_BASE,             0ffffh,         SegDesc_Property_32 |SegDesc_Property_4KB|SegDesc_Property_RW
-LABEL_DESC_DATA  :      Descriptor      DATA_SEG_BASE,             0ffffh,         SegDesc_Property_4KB|SegDesc_Property_RW
+LABEL_DESC_DATA  :      Descriptor   	DATA_SEG_BASE,             0ffffh,         SegDesc_Property_4KB|SegDesc_Property_RW
 
 
 GdtLen       equ            $-LABEL_GDT                         ;GDT 长度
@@ -59,10 +59,10 @@ SelectorData       equ         LABEL_DESC_DATA   -LABEL_GDT     ;数据段选择
 
 LABEL_BEGIN:
 		MOV		AX,CS
-		MOV     DS,AX
+		MOV 	DS,AX
 		MOV		ES,AX
 		MOV		SS,AX
-		MOV     SP,0
+		MOV 	SP,0
 
 		;BeginFunctionBlock		设置画面显示模式           1024*768*8bit	
 		MOV		AX,0x9000
@@ -122,12 +122,12 @@ SUCCEED:
 		;MOV     BYTE [LABEL_DESC_CODE32+7],AH
 		
 		;BeginFunctionBlock		载入GDT,打开地址线A20，连续的地址空间
-		XOR     EAX,EAX
+		XOR 	EAX,EAX
 		MOV		AX, CS
 		SHL		EAX,4D
-		ADD     EAX,LABEL_GDT
-		MOV     DWORD[GdtPtr+2],EAX
-		LGDT    [GdtPtr]
+		ADD 	EAX,LABEL_GDT
+		MOV 	DWORD[GdtPtr+2],EAX
+		LGDT   [GdtPtr]
 		CLI
 		IN		AL,92H
 		OR		AL,00000010B
@@ -142,14 +142,14 @@ SUCCEED:
 		JMP     pipelineflush
 pipelineflush:
 		MOV		AX,SelectorVideo
-		MOV     GS,AX
+		MOV 	GS,AX
 		MOV		AX,SelectorStack
 		MOV		SS,AX
 		MOV		ESP,0x1FFFFC
 		MOV		AX,SelectorData
 		MOV		DS,AX
 		;将内核拷贝到LABEL_DESC_CODE32段中
-		setMcpySrcDescNum LABEL_SEG_CODE32,KERNEL_SEG_BASE,1024
+		setMcpySrcDescNum LABEL_SEG_CODE32,KERNEL_SEG_BASE,KERNEL_SIZE
 		CALL	memcpy
 		;
 		
