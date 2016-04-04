@@ -24,11 +24,15 @@ SOFTWARE.
 #include "lib\zzlOS.h    "
 extern void io_hlt(void);
 extern void write(int i,char color);
-static char* zzlOS_str1="00000000000000";
+static char* zzlOS_str1="0123456789A";
+static char* zzlOS_str2="qwertyuiopasdfghjklzxcvbnm";
+static char* zzlOS_str3="QWERTYUIOPASDFGHJKLZXCVBNM";
 void HariMain(void)
 {
 	init_font();
-	drawStr(zzlOS_str1,20,20,0x01,0x00);
+	drawStr(zzlOS_str1,0,0,0x01,0x00);
+	drawStr(zzlOS_str2,16,0,0x01,0x00);
+	drawStr(zzlOS_str3,32,0,0x01,0x00);
 	while(1)
 		io_hlt();
 }
