@@ -26,31 +26,16 @@ static struct fontRect                       charUpperFont[26];
 static struct fontRect                   signFont[sign_NUMBER];
 static struct fontRect                             specialChar;
 static char                         signFontTable[sign_NUMBER];
-static void   drawFont(int type,	int leftX,int leftY,int foreGroundColor,int backGroundColor,int offset                                  );
-       void   drawStr (char*str,    int leftX,int leftY,int foreGroundColor,int backGroundColor	                                            );
-       void   drawNum (int num,     int leftX,int leftY,int foreGroundColor,int backGroundColor	                                            );
+static void   drawFont (int type,	int leftX,int leftY,int foreGroundColor,int backGroundColor,int offset                                      );
+       void   init_font(                                                                                                                        );
+       void   drawStr  (char*str,    int leftX,int leftY,int foreGroundColor,int backGroundColor	                                            );
+       void   drawNum  (int num,     int leftX,int leftY,int foreGroundColor,int backGroundColor	                                            );
+	 
 /////////////////////////////////////////////////
 extern void write      (int i,char color);
 extern int zzlOS_strlen(char*str        );
-////////////////////////test
-/*numberFont[0].bitMap[0]=0x00;
-numberFont[0].bitMap[1]=0x18;
-numberFont[0].bitMap[2]=0x24;
-numberFont[0].bitMap[3]=0x24;
-numberFont[0].bitMap[4]=0x42;
-numberFont[0].bitMap[5]=0x42;
-numberFont[0].bitMap[6]=0x42;
-numberFont[0].bitMap[7]=0x42;
-numberFont[0].bitMap[8]=0x42;
-numberFont[0].bitMap[9]=0x42;
-numberFont[0].bitMap[10]=0x42;
-numberFont[0].bitMap[11]=0x24;
-numberFont[0].bitMap[12]=0x24;
-numberFont[0].bitMap[13]=0x18;
-numberFont[0].bitMap[14]=0x00;
-numberFont[0].bitMap[15]=0x00;*/
 
-	   
+
 static void   drawFont(int type,	int leftX,int leftY,int foreGroundColor,int backGroundColor,int offset                                  ){
 	struct fontRect*fp=0;
 	if(type&type_NUMBER)
@@ -101,31 +86,18 @@ numberFont[0].bitMap[13]=0x18;
 numberFont[0].bitMap[14]=0x00;
 numberFont[0].bitMap[15]=0x00;
 				int i,j;
-				for(i=200;i<208;i++)
-					for(j=200;j<216;j++)
-						write(i*1024+j,0x2e);
 		   int len=zzlOS_strlen(str);
 		   int startX=leftX,startY=leftY;
-		   if(len==2)
-		   {
-			   for(i=100;i<108;i++)
-					for(j=100;j<116;j++)
-						write(i*1024+j,0x3c);
-		   }
-		   for(i=300;i<308;i++)
-					for(j=300;j<316;j++)
-						write(i*1024+j,0x1f);
 		   for(i=0;i<len;++i)
 		   {
 			   if(isDigts(str[i]))
 				   drawFont(type_NUMBER,        startX,startY, foreGroundColor, backGroundColor, str[i]-'0');
-			   
+
 		       else if(isLowerLetter(str[i]))
 				   drawFont(type_LOWER_LETTER,  startX,startY, foreGroundColor, backGroundColor, str[i]-'a');
 			   
 		       else if(isUpperLetter(str[i]))
 				   drawFont(type_UPPER_LETTER,  startX,startY, foreGroundColor, backGroundColor, str[i]-'A');
-			   
 		       else
 			   {
 				   int off=-1;
@@ -147,6 +119,7 @@ numberFont[0].bitMap[15]=0x00;
 		   }
 	   }
 void   drawNum (int num,     int leftX,int leftY,int foreGroundColor,int backGroundColor	                                            ){
+	
 	   }
 
 	   

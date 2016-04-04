@@ -14,13 +14,6 @@ int zzlOS_strlen  (char*str                                      ){
 	{
 		str++;
 		len++;
-	}
-	int i,j;
-	//write(1024*30,0x1f);
-		   
-			  for(i=200;i<208;i++)
-					for(j=200;j<216;j++)
-						write(i*1024+j,0x31);
-		   
+	}   
 	return len;
 }

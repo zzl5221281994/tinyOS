@@ -62,5 +62,5 @@ SegDesc_Property_386CGate		EQU		008CH  ;386调用门段
 SegDesc_Property_386IGate		EQU		008EH  ;386中断门段
 SegDesc_Property_TGate			EQU		008FH  ;386陷阱门段
 
-KERNEL_SIZE						EQU		1
+KERNEL_SIZE						EQU		4000
 ;内存分布图数据结构入口

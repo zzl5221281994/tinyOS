@@ -21,16 +21,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ************************************************************************************/
 #include "graphics\font.h"
+#include "lib\zzlOS.h    "
 extern void io_hlt(void);
 extern void write(int i,char color);
-static char* str1="00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+static char* zzlOS_str1="00000000000000";
 void HariMain(void)
 {
-	int i,j;
-	for(i=0;i<8;i++)
-		for(j=0;j<16;j++)
-			write(i*1024+j,0x1f);
-	drawStr(str1,0,0,0x1f,0x3c);
+	init_font();
+	drawStr(zzlOS_str1,20,20,0x01,0x00);
 	while(1)
 		io_hlt();
 }
