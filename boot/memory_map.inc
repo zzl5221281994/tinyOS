@@ -1,6 +1,6 @@
-		MOV		AX,0x7000         ;15H中断的入口参数，第一个结构起始地址为0x70014,0x70000存放结构数
+		MOV		AX,0x0700         ;15H中断的入口参数，第一个结构起始地址为0000:7028,0x7000存放bootInfo
 		MOV  	ES,AX
-		MOV		EDI,0x14
+		MOV		EDI,28d
         MOV		EBX,0
 		MOV		ESI,0             ;计数内存段个数
 LOOP1:  MOV		ECX,0020D
@@ -15,4 +15,6 @@ LOOP1:  MOV		ECX,0020D
 		JE		FIN
 		JMP  	LOOP1
 	FIN:
+	    ;MOV		AX,0X0700
+		;MOV		ES,AX
 		MOV		DWORD[ES:0],ESI

@@ -7,7 +7,7 @@
 / \/
 //Y
 */
-#include"I:\work\tolset\zzlOS\kernel\lib\zzlOS.h"
+#include "F:\work\tolset\zzlOS\kernel\lib\zzlOS.h"
 #define type_NUMBER                     1
 #define type_LOWER_LETTER               2
 #define type_UPPER_LETTER               4
@@ -85,7 +85,7 @@ static char                         signFontTable[sign_NUMBER];
 static void   drawFont (int type,	int leftX,int leftY,int foreGroundColor,int backGroundColor,int offset                                      );
        void   init_font(                                                                                                                        );
        void   drawStr  (char*str,    int leftX,int leftY,int foreGroundColor,int backGroundColor	                                            );
-       void   drawNum  (int num,     int leftX,int leftY,int foreGroundColor,int backGroundColor	                                            );
+       void   drawNum  (unsigned int num,     int leftX,int leftY,int foreGroundColor,int backGroundColor	                                            );
 	 
 /////////////////////////////////////////////////
 extern void write      (int i,char color);
@@ -177,7 +177,7 @@ void   drawStr (char*str,    int leftX,int leftY,int foreGroundColor,int backGro
 			   }
 		   }
 	   }
-void   drawNum (int num,     int leftX,int leftY,int foreGroundColor,int backGroundColor	                                                ){
+void   drawNum (unsigned int num,     int leftX,int leftY,int foreGroundColor,int backGroundColor	                                                ){
 	char desc[20];
 	intToStr(num,desc,20);
 	drawStr(desc,leftX,leftY,foreGroundColor,backGroundColor);

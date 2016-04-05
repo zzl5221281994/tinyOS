@@ -16,7 +16,7 @@ int zzlOS_strlen  (char*str                                      ){
 	}   
 	return len;
 }
-void intToStr(int num,char*desc,int bufSize					     ){
+void intToStr(unsigned int num,char*desc,int bufSize					     ){
 	int pos=bufSize-1;
 	if(num==0)
 	{
@@ -24,7 +24,9 @@ void intToStr(int num,char*desc,int bufSize					     ){
 		desc[1]='\0';
 		return;
 	}
-	while(num!=0){
+	//if(num<0)
+	//   num=num*(-1);
+	while(num>0){
 		int current=num%10;
 		desc[pos]='0'+current;
 		pos--;
