@@ -14,18 +14,22 @@ struct bootInfo{
 	unsigned int *vram                                 ;
 	int       screen_height                            ;
 	int       screen_width                             ;
-	int       mp_length                                ;	
+	int       mp_length                                ;
+    unsigned int codeBase                              ;
+    unsigned int dataBase                              ;	
     struct addr_range_descriptor mp[memory_Map_Length] ;
 };
 struct bootInfo boot_info;
-int init_bootInfo(/*struct bootInfo*p */                                      ){
+int init_bootInfo(                                                                  ){
     char*bp=bootInfo_Pointer,*mp=bootInfo_memMap;
 	boot_info.vram         =*(unsigned int*)(bp+0);
 	boot_info.screen_height=*(unsigned int*)(bp+4);
 	boot_info.screen_width =*(unsigned int*)(bp+8);
 	boot_info.mp_length    =*(unsigned int*)(bp+12);
+	boot_info.codeBase     =*(unsigned int*)(bp+16);
+	boot_info.dataBase     =*(unsigned int*)(bp+20);
 	if(boot_info.mp_length>=memory_Map_Length)
-		return zzlOS_ERROR;
+		return FALSE;
 	int i,j;
 	for(i=0;i<boot_info.mp_length;i++)
 	{
@@ -36,5 +40,5 @@ int init_bootInfo(/*struct bootInfo*p */                                      ){
 		boot_info.mp[i].Type         =*(unsigned int*)(mp+16);
 		mp+=20;
 	}
-	return zzlOS_SUCCESS;
+	return TRUE;
 }

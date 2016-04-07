@@ -26,27 +26,11 @@
 [FILE "naskfunc.nas"]			;
 
 		GLOBAL	_io_hlt
-		GLOBAL  _write
-
 [SECTION .text]
 
 _io_hlt:	; void io_hlt(void);
 		PUSH	EBP
 		MOV		EBP,ESP
 		HLT
-		POP		EBP
-		RET
-_write:
-		PUSH	EBP
-		MOV		EBP,ESP
-		
-		PUSH    EDI
-		PUSH    EAX
-		MOV		EDI,[EBP+8]
-		MOV		AH, [EBP+12]
-		MOV		BYTE[GS:EDI],AH
-		
-		POP     EAX
-		POP     EDI
 		POP		EBP
 		RET

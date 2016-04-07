@@ -22,8 +22,9 @@
 ;************************************************************************************/
 %include "boot\boot_parameter.inc"
 %include "boot\boot_macro.inc    "
+[bits 16]
 org 0x7e00
-%include "boot\memory_map.inc   ";此文件包含获取内存分布图的代码，并将得到的内存分布图数据结构保存在0x70014h开始的内存里
+%include "boot\memory_map.inc   ";此文件包含获取内存分布图的代码，并将得到的内存分布图数据结构保存在0x701c开始的内存里
 	JMP		LABEL_BEGIN
 ;BeginFunctionBlock		各段基地址
 ;
@@ -62,10 +63,10 @@ LABEL_BEGIN:
 		MOV		AX,0x0700
 		MOV		ES,AX
 		MOV		ECX,[ES:0]
-		MOV		[ES:12d],ECX         ;length_mp
-	    MOV		DWORD[ES:8d ],1024d  ;screen_width
-		MOV		DWORD[ES:4d ],768d   ;screen_height
-		
+		MOV		[ES:12d],ECX                         ;boot_info->length_mp
+	    MOV		DWORD[ES:8d ],1024d                  ;boot_info->screen_width
+		MOV		DWORD[ES:4d ],768d                   ;boot_info->screen_height
+		MOV		DWORD[ES:16d],KERNEL_SEG_BASE        ;boot_info->codeBase
 		;EndFunctionBlock       存放启动信息，进入kernel后用C语言读取
 		MOV		AX,CS
 		MOV 	DS,AX
@@ -179,6 +180,7 @@ pipelineflush:
 		MOV		ESI,[EBX+20]	;kernel数据在kernel.hrb中的偏移
 		ADD		ESI,EBX
 		MOV		EDI,[EBX+12]	;将数据放在指定位置
+		MOV	    [0X7014],EDI    ;dataBase(boot_info->dataBase)
 		CALL	memcpy
 skip:	
 		JMP		DWORD SelectorCode32:0x0000001b
@@ -194,5 +196,6 @@ memcpy:
 		JNZ		memcpy			; 引き算した結果が0でなければmemcpyへ
 		RET
 ;end		函数
+[bits 32]
 LABEL_SEG_CODE32:
 ;		

@@ -88,7 +88,6 @@ static void   drawFont (int type,	int leftX,int leftY,int foreGroundColor,int ba
        void   drawNum  (unsigned int num,     int leftX,int leftY,int foreGroundColor,int backGroundColor	                                            );
 	 
 /////////////////////////////////////////////////
-extern void write      (int i,char color);
 extern int zzlOS_strlen(char*str        );
 
 
@@ -116,9 +115,9 @@ static void   drawFont(int type,	int leftX,int leftY,int foreGroundColor,int bac
 			while(test>0)
 			{
 				if(test&bit)
-					write(startX+count,foreGroundColor);
+					write_video8(startX+count,foreGroundColor);
 				else
-					write(startX+count,backGroundColor);
+					write_video8(startX+count,backGroundColor);
 				count++;
 				test=(test>>1);
 			}
