@@ -7,14 +7,14 @@ char*readFile ="fontLib.txt";
 int strToInt(char*str                                           );
 void intToStr(int num,char*desc  							    );
 int main(int argc,char**argv){
-	if(argc!=4)
+	if(argc!=2)
 	{
 		printf("number of parameter error!\n");
 		return 0;
 	}
-	char*arrayName=argv[1];
-	int start     =strToInt(argv[2]);
-	int number    =strToInt(argv[3]);
+	//char*arrayName=argv[1];
+	//int start     =strToInt(argv[2]);
+	int number    =strToInt(argv[1]);
 	FILE*wf=fopen(writeFile,"w+");
 	FILE*rf=fopen(readFile,"rb+");
 	if(rf==NULL)
@@ -39,13 +39,13 @@ int main(int argc,char**argv){
 			printf("\n");
 		}
 		char desc[20];
-		intToStr(start,desc);
-		start++;
-	    string number(desc);
+		//intToStr(start,desc);
+		//start++;
+	    /*string number(desc);
 		string result(arrayName);
 		result+="[";
 		result+=number;
-		result+="]";
+		result+="]";*/
 		int sum;
 		for(int i=0;i<16;i++)
 		{
@@ -58,16 +58,17 @@ int main(int argc,char**argv){
 			char tempStr[20];
 			intToStr(sum,tempStr);
 			string value(tempStr);
-			intToStr(i,tempStr);
-			string index(tempStr);
+			
 			string finalResult;
-			finalResult="       "+result+".bitMap["+index+"]="+value+";";
+			finalResult=value+",";
 			int len=finalResult.length();
 			for(int k=0;k<len;k++)
 				putc(finalResult[k],wf);
-			putc('\n',wf);
-		}	
+		}
+    putc('\n',wf);		
 	}
+	fclose(rf);
+	fclose(wf);
 	return 0;
 		
 }

@@ -43,7 +43,7 @@
 #define SegDesc_Property_386IGate               0x008E  //;386中断门段
 #define SegDesc_Property_TGate                  0x008F  //;386陷阱门段
 
-KERNEL_SIZE						EQU		12000
+//KERNEL_SIZE						EQU		12000
 //;内存分布图数据结构入口*****************************************************************/
 #define memory_Map_Length 20
 struct addr_range_descriptor{
@@ -59,7 +59,9 @@ struct bootInfo{
 	int       screen_width                             ;
 	int       mp_length                                ;
     unsigned int codeBase                              ;
-    unsigned int dataBase                              ;	
+    unsigned int dataBase                              ;
+    char *label_gdt                                    ;
+	char *gdt_ptr                                      ;
     struct addr_range_descriptor mp[memory_Map_Length] ;
 };
 extern struct bootInfo boot_info;

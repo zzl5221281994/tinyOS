@@ -1,13 +1,14 @@
-/*-------------->x
-/*|
-/*|
-/*|
-/*|
-/*|
-/ \/
-//Y
-*/
-#include "F:\work\tolset\zzlOS\kernel\lib\zzlOS.h"
+//* -------------->x
+//* |
+//* |
+//* |
+//* |
+//* |
+//  \/
+// Y
+
+#include "H:\work\tolset\tinyOS\kernel\lib\tiny_string.h"
+#include "H:\work\tolset\tinyOS\kernel\lib\tinyOS.h"
 #define type_NUMBER                     1
 #define type_LOWER_LETTER               2
 #define type_UPPER_LETTER               4
@@ -88,7 +89,7 @@ static void   drawFont (int type,	int leftX,int leftY,int foreGroundColor,int ba
        void   drawNum  (unsigned int num,     int leftX,int leftY,int foreGroundColor,int backGroundColor	                                            );
 	 
 /////////////////////////////////////////////////
-extern int zzlOS_strlen(char*str        );
+extern int tiny_strlen(char*str        );
 
 
 
@@ -126,7 +127,7 @@ static void   drawFont(int type,	int leftX,int leftY,int foreGroundColor,int bac
 void   drawStr (char*str,    int leftX,int leftY,int foreGroundColor,int backGroundColor	                                                )
 	   {
 				int i,j;
-		   int len=zzlOS_strlen(str);
+		   int len=tiny_strlen(str);
 		   int startX=leftX,startY=leftY;
 		   for(i=0;i<len;++i)
 		   {
@@ -176,23 +177,9 @@ void   drawStr (char*str,    int leftX,int leftY,int foreGroundColor,int backGro
 			   }
 		   }
 	   }
+	   
 void   drawNum (unsigned int num,     int leftX,int leftY,int foreGroundColor,int backGroundColor	                                                ){
 	char desc[20];
 	intToStr(num,desc,20);
 	drawStr(desc,leftX,leftY,foreGroundColor,backGroundColor);
     }
-	   
-	   
-	   
-	   
-	   
-	   
-	   
-	   
-	   
-	   
-	   
-	   
-	   
-	   
-	   

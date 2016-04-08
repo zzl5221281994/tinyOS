@@ -1,5 +1,5 @@
-#include "F:\work\tolset\zzlOS\kernel\lib\zzlOS.h"
-#include "F:\work\tolset\zzlOS\kernel\graphics\font.h"
+#include "H:\work\tolset\tinyOS\kernel\lib\tinyOS.h"
+#include "H:\work\tolset\tinyOS\kernel\graphics\font.h"
 #define memory_Map_Length 20
 #define bootInfo_Pointer  0x7000
 #define bootInfo_memMap   0x701c
@@ -21,8 +21,8 @@ struct bootInfo{
 };
 struct bootInfo boot_info;
 int init_bootInfo(                                                                  ){
-    char*bp=bootInfo_Pointer,*mp=bootInfo_memMap;
-	boot_info.vram         =*(unsigned int*)(bp+0);
+    char*bp=(char*)bootInfo_Pointer,*mp=(char*)bootInfo_memMap;
+	boot_info.vram         = (unsigned int*)(*(unsigned int*)(bp+0));
 	boot_info.screen_height=*(unsigned int*)(bp+4);
 	boot_info.screen_width =*(unsigned int*)(bp+8);
 	boot_info.mp_length    =*(unsigned int*)(bp+12);
@@ -30,7 +30,7 @@ int init_bootInfo(                                                              
 	boot_info.dataBase     =*(unsigned int*)(bp+20);
 	if(boot_info.mp_length>=memory_Map_Length)
 		return FALSE;
-	int i,j;
+	int i;
 	for(i=0;i<boot_info.mp_length;i++)
 	{
 		boot_info.mp[i].BaseAddrLow  =*(unsigned int*)(mp+0 );
