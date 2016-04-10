@@ -25,7 +25,8 @@
 [BITS 32]						;
 [FILE "naskfunc.nas"]			;
 
-		GLOBAL	_io_hlt
+		GLOBAL	_io_hlt         ;void io_hlt(                  );
+		GLOBAL  _setGdt         ;void setGdt(unsigned char*lgdt);
 [SECTION .text]
 
 _io_hlt:	; void io_hlt(void);
@@ -33,4 +34,16 @@ _io_hlt:	; void io_hlt(void);
 		MOV		EBP,ESP
 		HLT
 		POP		EBP
+		RET
+_setGdt:
+		PUSH	EBP
+		MOV		EBP,ESP
+		MOV		EAX,[EBP+8]
+		LGDT	[EAX]
+		POP		EBP
+		
+		POP		EDX
+		PUSH	8
+		PUSH	EDX
+		RETF
 		RET

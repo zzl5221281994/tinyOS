@@ -24,7 +24,7 @@
 		ORG		0x7c00
 		JMP		entry
 entry:
-		setReadBuff 0x07e0,0x0000     	  ;setReadBuff
+		setReadBuff 0x0000,0x7e00     	  ;setReadBuff
 		setCHS  0d,0,2d,17				  ;setCHS Cylinder,head,sector,sector number
 		MOV		AH,2
 		INT 	13H

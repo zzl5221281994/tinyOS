@@ -7,8 +7,8 @@
 //  \/
 // Y
 
-#include "H:\work\tolset\tinyOS\kernel\lib\tiny_string.h"
-#include "H:\work\tolset\tinyOS\kernel\lib\tinyOS.h"
+#include "F:\work\tolset\tinyOS\kernel\lib\tiny_string.h"
+#include "F:\work\tolset\tinyOS\kernel\lib\tinyOS.h"
 #define type_NUMBER                     1
 #define type_LOWER_LETTER               2
 #define type_UPPER_LETTER               4
@@ -80,16 +80,16 @@ unsigned char                       charUpperFont[26][16]={0,24,24,24,24,36,36,3
                                                            0,231,66,66,36,36,36,24,36,36,36,66,66,231,0,0,
                                                            0,238,68,68,68,40,40,40,16,16,16,16,16,124,0,0,
                                                            0,254,132,132,8,8,16,16,32,32,64,66,130,254,0,0};
-unsigned char                   signFont[sign_NUMBER][16];
-unsigned char                             specialChar;
-static char                         signFontTable[sign_NUMBER];
+unsigned char                       signFont[sign_NUMBER][16];
+unsigned char                                     specialChar;
+static unsigned char               signFontTable[sign_NUMBER];
 static void   drawFont (int type,	int leftX,int leftY,int foreGroundColor,int backGroundColor,int offset                                      );
        void   init_font(                                                                                                                        );
-       void   drawStr  (char*str,    int leftX,int leftY,int foreGroundColor,int backGroundColor	                                            );
-       void   drawNum  (unsigned int num,     int leftX,int leftY,int foreGroundColor,int backGroundColor	                                            );
+       void   drawStr  (unsigned char*str,    int leftX,int leftY,int foreGroundColor,int backGroundColor	                                    );
+       void   drawNum  (unsigned int num,     int leftX,int leftY,int foreGroundColor,int backGroundColor	                                    );
 	 
 /////////////////////////////////////////////////
-extern int tiny_strlen(char*str        );
+extern int tiny_strlen(unsigned char*str        );
 
 
 
@@ -124,7 +124,7 @@ static void   drawFont(int type,	int leftX,int leftY,int foreGroundColor,int bac
 			}
 		}
 }
-void   drawStr (char*str,    int leftX,int leftY,int foreGroundColor,int backGroundColor	                                                )
+void   drawStr (unsigned char*str,    int leftX,int leftY,int foreGroundColor,int backGroundColor	                                                )
 	   {
 				int i,j;
 		   int len=tiny_strlen(str);
@@ -179,7 +179,7 @@ void   drawStr (char*str,    int leftX,int leftY,int foreGroundColor,int backGro
 	   }
 	   
 void   drawNum (unsigned int num,     int leftX,int leftY,int foreGroundColor,int backGroundColor	                                                ){
-	char desc[20];
+	unsigned char desc[20];
 	intToStr(num,desc,20);
 	drawStr(desc,leftX,leftY,foreGroundColor,backGroundColor);
     }
