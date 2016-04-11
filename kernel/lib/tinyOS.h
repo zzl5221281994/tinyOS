@@ -73,8 +73,8 @@ CRO:
 #define Selector_RPL2			2	; ┃
 #define Selector_RPL3			3	; ┛
 
-#define Selector_TI_Gdt		EQU	0	; ┓TI
-#define Selector_TI_Ldt		EQU	4	; ┛
+#define Selector_TI_Gdt			0	; ┓TI
+#define Selector_TI_Ldt			4	; ┛
 //;----------------------------------------------------------------------------
 //全局使用的常量,函数的宏定义
 #define NULL    0
@@ -82,8 +82,8 @@ CRO:
 #define TRUE    1
 #define write_video8( add,color) ((*(vram8 +(add)))=(color))
 #define write_video32(add,color) ((*(vram32+(add)))=(color))
-extern unsigned char         *vram8 ;
-extern unsigned int *vram32;
-extern void gen_code_dataDescriptor(unsigned char desc[8],int base,unsigned int limit,unsigned int attribute);
-extern void      gen_sys_Descriptor(unsigned char desc[8],int base,unsigned int limit,unsigned int attribute);
+extern u_int8           *vram8 ;
+extern u_int32          *vram32;
+extern void gen_normalDescriptor(u_int8 desc[8],u_int32 base    ,u_int32 limit ,u_int32 attribute                         );
+extern void   gen_gateDescriptor(u_int8 desc[8],u_int32 Selector,u_int32 offset,u_int32 DCount,u_int32 attribute          );
 #endif

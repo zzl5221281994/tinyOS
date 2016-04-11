@@ -3,10 +3,10 @@
 #define	PUBLIC		
 #define	PRIVATE	static
 
-typedef	unsigned long long	u64  ;
-typedef	unsigned int		u32  ;
-typedef	unsigned short		u16  ;
-typedef	unsigned char		u8   ;
+typedef	unsigned long long	u_int64  ;
+typedef	unsigned int		u_int32  ;
+typedef	unsigned short		u_int16  ;
+typedef	unsigned char		u_int8   ;
 
 typedef long long           int64;
 typedef int                 int32;

@@ -1,6 +1,6 @@
 #include "tinyOS.h"
-int tiny_strlen  (unsigned char*str                                      ){
-	int len=0;
+u_int32 tiny_strlen  (int8*str                                                   ){
+	int32 len=0;
 	while((*str)!='\0')
 	{
 		str++;
@@ -8,8 +8,8 @@ int tiny_strlen  (unsigned char*str                                      ){
 	}   
 	return len;
 }
-void intToStr(unsigned int num,unsigned char*desc,int bufSize					     ){
-	int pos=bufSize-1;
+void intToStr        (u_int32 num ,u_int8*  desc ,int32   bufSize				 ){
+	int32 pos=bufSize-1;
 	if(num==0)
 	{
 		desc[0]='0';
@@ -17,27 +17,27 @@ void intToStr(unsigned int num,unsigned char*desc,int bufSize					     ){
 		return;
 	}
 	while(num>0){
-		int current=num%10;
+		int32 current=num%10;
 		desc[pos]='0'+current;
 		pos--;
 		num=num/10;
 	}
 	pos++;
-	int len=0,i;
+	int32 len=0,i;
 	for(i=pos;i<=bufSize-1;i++)
 		desc[len++]=desc[i];
 	desc[len]='\0';
 }
-int memcpy8           (unsigned char        * src,unsigned char        * desc,unsigned int buffSize                  ){
-	unsigned int i=0;
+int32 memcpy8        (u_int8*  src,u_int8*  desc ,u_int32 buffSize               ){
+	u_int32 i=0;
 	if(src==NULL||desc==NULL)
 		return FALSE;
 	while((i++)<buffSize)
 		(*(desc++))=(*(src++));
 	return TRUE;
 }
-int memcpy32          (unsigned int* src,unsigned int* desc,unsigned int buffSize                  ){
-	unsigned int i=0;
+int32 memcpy32       (u_int32* src,u_int32* desc ,u_int32 buffSize               ){
+	u_int32 i=0;
 	if(src==NULL||desc==NULL)
 		return FALSE;
 	while((i++)<buffSize)

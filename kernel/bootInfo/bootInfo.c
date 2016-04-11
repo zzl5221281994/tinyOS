@@ -1,49 +1,49 @@
-#include "F:\work\tolset\tinyOS\kernel\lib\tinyOS.h   "
-#include "F:\work\tolset\tinyOS\kernel\graphics\font.h"
+#include "I:\work\tolset\tinyOS\kernel\lib\tinyOS.h   "
+#include "I:\work\tolset\tinyOS\kernel\graphics\font.h"
 #include "bootInfo.h                                  "
 extern struct bootInfo boot_info;
 extern struct main_gdt       gdt;
 extern struct main_idt       idt;
 
-extern void setGdt(unsigned char*lgdt);
+extern void setGdt(u_int8*lgdt);
 int init_bootInfo(                                                                  ){
-    unsigned char*bp=(unsigned char*)bootInfo_Pointer,*mp_ptr=(unsigned char*)bootInfo_memMap;
-	boot_info.vram         = (unsigned int*)(*(unsigned int*)(bp+0));
-	boot_info.screen_height=*(unsigned int*)(bp+4 );
-	boot_info.screen_width =*(unsigned int*)(bp+8 );
-	boot_info.mp_ptr_length=*(unsigned int*)(bp+12);
-	boot_info.codeBase     =*(unsigned int*)(bp+16);
-	boot_info.dataBase     =*(unsigned int*)(bp+20);
-	boot_info.label_gdt    = (unsigned int*)(*(unsigned int*)(bp+24));
-	boot_info.numOfGdts    =*(unsigned int*)(bp+28);
+    u_int8*bp=(u_int8*)bootInfo_Pointer,*mp_ptr=(u_int8*)bootInfo_memMap;
+	boot_info.vram         = (u_int32*)(*(u_int32*)(bp+0));
+	boot_info.screen_height=*(u_int32*)(bp+4 );
+	boot_info.screen_width =*(u_int32*)(bp+8 );
+	boot_info.mp_ptr_length=*(u_int32*)(bp+12);
+	boot_info.codeBase     =*(u_int32*)(bp+16);
+	boot_info.dataBase     =*(u_int32*)(bp+20);
+	boot_info.label_gdt    = (u_int32*)(*(u_int32*)(bp+24));
+	boot_info.numOfGdts    =*(u_int32*)(bp+28);
 	if(boot_info.mp_ptr_length>=memory_Map_Length)
 		return FALSE;
 	int i;
 	for(i=0;i<boot_info.mp_ptr_length;i++)
 	{
-		boot_info.mp[i].BaseAddrLow  =*(unsigned int*)(mp_ptr+0 );
-		boot_info.mp[i].BaseAddrHigh =*(unsigned int*)(mp_ptr+4 );
-		boot_info.mp[i].lengthLow    =*(unsigned int*)(mp_ptr+8 );
-		boot_info.mp[i].lengthHigh   =*(unsigned int*)(mp_ptr+12);
-		boot_info.mp[i].Type         =*(unsigned int*)(mp_ptr+16);
+		boot_info.mp[i].BaseAddrLow  =*(u_int32*)(mp_ptr+0 );
+		boot_info.mp[i].BaseAddrHigh =*(u_int32*)(mp_ptr+4 );
+		boot_info.mp[i].lengthLow    =*(u_int32*)(mp_ptr+8 );
+		boot_info.mp[i].lengthHigh   =*(u_int32*)(mp_ptr+12);
+		boot_info.mp[i].Type         =*(u_int32*)(mp_ptr+16);
 		mp_ptr+=20;
 	}
 	return TRUE;
 }
 int init_gdt     (                                                                  ){
-	unsigned char*ptr=(unsigned char*)boot_info.label_gdt;
+	u_int8*ptr=(u_int8*)boot_info.label_gdt;
 	int num          =boot_info.numOfGdts                ;
 	int i;
 	if(num>max_gdtDescriptor)
 		return FALSE;
 	for(i=0;i<num;i++)
 	{
-		memcpy8(ptr,(unsigned char*)(&(gdt.gdtDescriptor[i])),8);
+		memcpy8(ptr,(u_int8*)(&(gdt.gdtDescriptor[i])),8);
 		ptr=ptr+8;
 	}
 	gdt.gdtDescriptor_length=num;
-	unsigned int limit=256*8-1;
-	unsigned int base =gdt.gdtDescriptor    ;
+	u_int32 limit=256*8-1;
+	u_int32 base =gdt.gdtDescriptor    ;
 	gdt.gdt_ptr[0]=(limit&0x000000ff);
 	gdt.gdt_ptr[1]=((limit&0x0000ff00)>>8);
 	gdt.gdt_ptr[2]=(base &0x000000ff);

@@ -7,8 +7,8 @@
 //  \/
 // Y
 
-#include "F:\work\tolset\tinyOS\kernel\lib\tiny_string.h"
-#include "F:\work\tolset\tinyOS\kernel\lib\tinyOS.h"
+#include "I:\work\tolset\tinyOS\kernel\lib\tiny_string.h"
+#include "I:\work\tolset\tinyOS\kernel\lib\tinyOS.h"
 #define type_NUMBER                     1
 #define type_LOWER_LETTER               2
 #define type_UPPER_LETTER               4
@@ -18,7 +18,7 @@
 #define fontRect_WIDTH                  8
 #define fontRect_HEIGHT                 16
 /*数字，大小写字母，符号，符号的查找表，以及一个特殊符号（表示错误字符）*/
-unsigned char                          numberFont[10][16]={0,24,36,36,66,66,66,66,66,66,66,36,36,24,0,0,
+u_int8                          numberFont[10][16]={0,24,36,36,66,66,66,66,66,66,66,36,36,24,0,0,
                                                            0,8,24,40,8,8,8,8,8,8,8,8,8,62,0,0,
                                                            0,24,36,66,66,2,4,8,16,32,32,64,64,126,0,0,
                                                            0,24,36,66,2,2,4,24,4,2,2,66,36,24,0,0,
@@ -28,7 +28,7 @@ unsigned char                          numberFont[10][16]={0,24,36,36,66,66,66,6
                                                            0,126,66,66,4,4,8,8,8,16,16,16,16,56,0,0,
                                                            0,24,36,66,66,66,36,24,36,66,66,66,36,24,0,0,
                                                            0,24,36,66,66,66,66,66,38,26,2,66,36,24,0,0};
-unsigned char                       charLowerFont[26][16]={0,0,0,0,0,112,8,4,60,68,132,132,140,118,0,0,
+u_int8                       charLowerFont[26][16]={0,0,0,0,0,112,8,4,60,68,132,132,140,118,0,0,
                                                            192,64,64,64,64,88,100,66,66,66,66,66,100,88,0,0,
                                                            0,0,0,0,0,48,76,132,132,128,128,130,68,56,0,0,
                                                            12,4,4,4,4,52,76,132,132,132,132,132,76,54,0,0,
@@ -54,7 +54,7 @@ unsigned char                       charLowerFont[26][16]={0,0,0,0,0,112,8,4,60,
                                                            0,0,0,0,0,198,68,40,40,16,40,40,68,198,0,0,
                                                            0,0,0,0,0,231,66,66,36,36,36,24,24,16,16,96,
                                                            0,0,0,0,0,254,130,132,8,16,32,66,130,254,0,0};
-unsigned char                       charUpperFont[26][16]={0,24,24,24,24,36,36,36,36,126,66,66,66,231,0,0,
+u_int8                       charUpperFont[26][16]={0,24,24,24,24,36,36,36,36,126,66,66,66,231,0,0,
                                                            0,240,72,68,68,68,72,120,68,66,66,66,68,248,0,0,
                                                            0,58,70,66,130,128,128,128,128,128,130,66,68,56,0,0,
                                                            0,248,68,68,66,66,66,66,66,66,66,68,68,248,0,0,
@@ -80,21 +80,19 @@ unsigned char                       charUpperFont[26][16]={0,24,24,24,24,36,36,3
                                                            0,231,66,66,36,36,36,24,36,36,36,66,66,231,0,0,
                                                            0,238,68,68,68,40,40,40,16,16,16,16,16,124,0,0,
                                                            0,254,132,132,8,8,16,16,32,32,64,66,130,254,0,0};
-unsigned char                       signFont[sign_NUMBER][16];
-unsigned char                                     specialChar;
-static unsigned char               signFontTable[sign_NUMBER];
-static void   drawFont (int type,	int leftX,int leftY,int foreGroundColor,int backGroundColor,int offset                                      );
-       void   init_font(                                                                                                                        );
-       void   drawStr  (unsigned char*str,    int leftX,int leftY,int foreGroundColor,int backGroundColor	                                    );
-       void   drawNum  (unsigned int num,     int leftX,int leftY,int foreGroundColor,int backGroundColor	                                    );
+u_int8                       signFont[sign_NUMBER][16];
+u_int8                                     specialChar;
+static u_int8               signFontTable[sign_NUMBER];
+static void   drawFont (int32 type,	   int32 leftX,int32 leftY,int32 foreGroundColor,int32 backGroundColor,int32 offset                         );
+       void   drawStr  (u_int8*str,    int32 leftX,int32 leftY,int32 foreGroundColor,int32 backGroundColor	                                    );
+       void   drawNum  (u_int32 num,   int32 leftX,int32 leftY,int32 foreGroundColor,int32 backGroundColor	                                    );
 	 
 /////////////////////////////////////////////////
-extern int tiny_strlen(unsigned char*str        );
 
 
 
-static void   drawFont(int type,	int leftX,int leftY,int foreGroundColor,int backGroundColor,int offset                                  ){
-	unsigned char*fp=NULL;
+static void   drawFont(int32 type,	int32 leftX,int32 leftY,int32 foreGroundColor,int32 backGroundColor,int32 offset                                  ){
+	u_int8*fp=NULL;
 	if(type&type_NUMBER)
 		fp=&numberFont[offset][0];
 	
@@ -108,11 +106,11 @@ static void   drawFont(int type,	int leftX,int leftY,int foreGroundColor,int bac
 		fp=&signFont[offset][0];
 	else
 		fp=&specialChar;
-	int i;
+	int32 i;
 		for(i=0;i<16;++i)
 		{
-			unsigned char test=0x80,bit =fp[i];
-			int count=0,              startX=((leftX+i)<<10)+leftY;
+			u_int8 test=0x80,bit =fp[i];
+			int32 count=0,              startX=((leftX+i)<<10)+leftY;
 			while(test>0)
 			{
 				if(test&bit)
@@ -124,11 +122,11 @@ static void   drawFont(int type,	int leftX,int leftY,int foreGroundColor,int bac
 			}
 		}
 }
-void   drawStr (unsigned char*str,    int leftX,int leftY,int foreGroundColor,int backGroundColor	                                                )
+void   drawStr (u_int8*str,    int32 leftX,int32 leftY,int32 foreGroundColor,int32 backGroundColor	                                                )
 	   {
-				int i,j;
-		   int len=tiny_strlen(str);
-		   int startX=leftX,startY=leftY;
+				int32 i,j;
+		   int32 len=tiny_strlen((int8*)str);
+		   int32 startX=leftX,startY=leftY;
 		   for(i=0;i<len;++i)
 		   {
 			   if(isDigts(str[i]))
@@ -159,8 +157,8 @@ void   drawStr (unsigned char*str,    int leftX,int leftY,int foreGroundColor,in
 			   /////////////////////////////////////////////test
 		       else
 			   {
-				   int off=-1;
-				   int j;
+				   int32 off=-1;
+				   int32 j;
 				   for(j=0;j<sign_NUMBER;++j)
 					   if(str[i]==signFontTable[j])
 					   {
@@ -178,8 +176,8 @@ void   drawStr (unsigned char*str,    int leftX,int leftY,int foreGroundColor,in
 		   }
 	   }
 	   
-void   drawNum (unsigned int num,     int leftX,int leftY,int foreGroundColor,int backGroundColor	                                                ){
-	unsigned char desc[20];
+void   drawNum (u_int32 num,     int32 leftX,int32 leftY,int32 foreGroundColor,int32 backGroundColor	                                                ){
+	u_int8 desc[20];
 	intToStr(num,desc,20);
 	drawStr(desc,leftX,leftY,foreGroundColor,backGroundColor);
     }

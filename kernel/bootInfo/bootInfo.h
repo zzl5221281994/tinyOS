@@ -7,32 +7,32 @@
 #define bootInfo_Pointer  0x7000
 #define bootInfo_memMap   0x7020
 struct main_gdt             {
-	unsigned char  gdtDescriptor[max_gdtDescriptor][8];
-	unsigned char  gdt_ptr[6]                         ;
-    unsigned int   gdtBase                            ;	
-	unsigned int   gdtLimit                           ;
-	unsigned int   gdtDescriptor_length               ;
+	u_int8  gdtDescriptor[max_gdtDescriptor][8];
+	u_int8  gdt_ptr[6]                         ;
+    u_int32   gdtBase                          ;	
+	u_int32   gdtLimit                         ;
+	u_int32   gdtDescriptor_length             ;
 };
 struct main_idt             {
-	unsigned char  idtDescriptor[max_idtDescriptor][8];
-	unsigned int   idtDescriptor_length;
+	u_int8    idtDescriptor[max_idtDescriptor][8];
+	u_int32   idtDescriptor_length               ;
 };
 struct addr_range_descriptor{
-	unsigned int   BaseAddrLow ;
-	unsigned int   BaseAddrHigh;
-	unsigned int   lengthLow   ;
-	unsigned int   lengthHigh  ;
-	unsigned int   Type        ;
+	u_int32   BaseAddrLow ;
+	u_int32   BaseAddrHigh;
+	u_int32   lengthLow   ;
+	u_int32   lengthHigh  ;
+	u_int32   Type        ;
 };
 struct bootInfo{
-	unsigned int   *vram                                 ;
-	unsigned int   screen_height                         ;
-	unsigned int   screen_width                          ;
-	unsigned int   mp_ptr_length                         ;
-    unsigned int   codeBase                              ;
-    unsigned int   dataBase                              ;
-    unsigned int   *label_gdt                            ;
-    unsigned int   *numOfGdts                            ;	
+	u_int32   *vram                                 ;
+	u_int32   screen_height                         ;
+	u_int32   screen_width                          ;
+	u_int32   mp_ptr_length                         ;
+    u_int32   codeBase                              ;
+    u_int32   dataBase                              ;
+    u_int32   *label_gdt                            ;
+    u_int32   *numOfGdts                            ;	
     struct   addr_range_descriptor mp[memory_Map_Length] ;
 };
 extern int init_bootInfo(                                                             );
