@@ -30,6 +30,8 @@
 		GLOBAL _callGate_enter  ;void callGate_enter();
 		GLOBAL _callGate_return ;void callGate_return();
 		GLOBAL _callGate_test
+		GLOBAL _callGate_ring3
+		GLOBAL _move_to_ring3
 		EXTERN _drawNum
 [SECTION .text]
 
@@ -54,13 +56,15 @@ _setGdt:
 _callGate_enter:
 		PUSH	EBP
 		MOV		EBP,ESP
-		MOV		EAX,[EBP+8]
-		PUSH	EAX
-		CALL    40:0
+		MOV		EDX,[EBP+8]
+		PUSH	EDX
+		PUSH	0
+		CALL    FAR[ESP]
 		POP		EAX
-		;POP		EAX
+		POP		EAX
 		POP		EBP
 		RET
+
 _callGate_return:
 		RETF
 _callGate_test:
@@ -70,6 +74,27 @@ _callGate_test:
 		PUSH 	700
 		PUSH	1234
 		CALL    _drawNum
-		JMP  DWORD 16:0
 		ADD		ESP,20
 		RETF
+_callGate_ring3:
+		MOV		EDI,0XE0000000
+		LABEL1:
+		MOV BYTE[EDI],0X1f
+		INC     EDI
+		CMP		EDI,0XE0002048
+		JNE		LABEL1
+		;CALL   DWORD 40+3:0
+		JMP		$
+_move_to_ring3:
+		PUSH	EBP
+		MOV		EBP,ESP
+		MOV		EAX,[EBP+8]  ;CODE
+		MOV		EDX,[EBP+12] ;STACK
+		PUSH	EDX
+		PUSH	0x1000000
+		PUSH	EAX
+		PUSH 	0
+		RETF
+		
+		
+		

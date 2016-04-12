@@ -61,23 +61,37 @@ int32 addDes(u_int32 base,u_int32 limit,u_int32 attribute){
 	return gdt.gdtDescriptor_length-1;
 }
 void drawInfo();
-extern void callGate_enter(u_int32 Selector);
+//extern void callGate_enter(u_int32 Selector);
 //extern void callGate_return();
 extern void callGate_test();
+extern void callGate_ring3();
+extern void move_to_ring3(int32 code,int32 stack);
 void HariMain(void)
 {
 	init_bootInfo();
 	init_gdt();
 	vram8 =(u_int8*)boot_info.vram;
 	vram32=(u_int32* )boot_info.vram;
-	test(1,2,cmp);
-	int32 index=addDes(boot_info.codeBase,0xffff,SegDesc_Property_32 |SegDesc_Property_EXEC_R);
-	
+	u_int8 an[20];
+	an[0]='a';
+	an[1]='\0';
+	drawStr(an,200,200,0x3c,0x00);
+	//test(1,2,cmp);
 	u_int8 desc[8];
-	gen_gateDescriptor(desc,index*8,callGate_test,0,SegDesc_Property_386CGate|SegDesc_Property_DPL0);
+	//add ring0 callGate code
+	int32 index=addDes(boot_info.codeBase,0xffff,SegDesc_Property_32 |SegDesc_Property_EXEC_R);
+	gen_gateDescriptor(desc,index*8,callGate_test,0,SegDesc_Property_386CGate|SegDesc_Property_DPL3);
 	memcpy8(desc,(u_int8*)(&(gdt.gdtDescriptor[gdt.gdtDescriptor_length])),8);
 	gdt.gdtDescriptor_length++;
-	callGate_enter(8*(gdt.gdtDescriptor_length-1));
+	//add ring3 stack
+	int32 ring3StackSel=addDes(0x0,0xfffff,SegDesc_Property_32|SegDesc_Property_DPL3|SegDesc_Property_RW|SegDesc_Property_4KB);
+	//add ring3 code
+	int32 ring3CodeSel=addDes(boot_info.codeBase+callGate_ring3,0xffff,SegDesc_Property_32|SegDesc_Property_EXEC_R|SegDesc_Property_DPL3);
+	
+	//add callGate
+	//callGate_enter(8*(gdt.gdtDescriptor_length-1));
+	//move_to_ring3(ring3CodeSel*8+Selector_RPL3,ring3StackSel*8+Selector_RPL3);
+	//move_to_ring3(ring3CodeSel*8+3,ring3StackSel*8+3);
 	drawInfo();
 	test(2,1,cmp);
 	while(1)

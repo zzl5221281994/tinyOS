@@ -1,5 +1,5 @@
-#include "I:\work\tolset\tinyOS\kernel\lib\tinyOS.h   "
-#include "I:\work\tolset\tinyOS\kernel\graphics\font.h"
+#include "F:\work\tolset\tinyOS\kernel\lib\tinyOS.h   "
+#include "F:\work\tolset\tinyOS\kernel\graphics\font.h"
 #include "bootInfo.h                                  "
 extern struct bootInfo boot_info;
 extern struct main_gdt       gdt;

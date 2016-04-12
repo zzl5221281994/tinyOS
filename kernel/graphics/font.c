@@ -7,8 +7,8 @@
 //  \/
 // Y
 
-#include "I:\work\tolset\tinyOS\kernel\lib\tiny_string.h"
-#include "I:\work\tolset\tinyOS\kernel\lib\tinyOS.h"
+#include "F:\work\tolset\tinyOS\kernel\lib\tiny_string.h"
+#include "F:\work\tolset\tinyOS\kernel\lib\tinyOS.h"
 #define type_NUMBER                     1
 #define type_LOWER_LETTER               2
 #define type_UPPER_LETTER               4

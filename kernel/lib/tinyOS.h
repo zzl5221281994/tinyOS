@@ -68,13 +68,13 @@ CRO:
 ; 其中:
 *****************************************************************************************/
 
-#define Selector_RPL0			0	; ┓
-#define Selector_RPL1			1	; ┣ RPL
-#define Selector_RPL2			2	; ┃
-#define Selector_RPL3			3	; ┛
+#define Selector_RPL0			0//	; ┓
+#define Selector_RPL1			1//	; ┣ RPL
+#define Selector_RPL2			2//	; ┃
+#define Selector_RPL3			3//	; ┛
 
-#define Selector_TI_Gdt			0	; ┓TI
-#define Selector_TI_Ldt			4	; ┛
+#define Selector_TI_Gdt			0//	; ┓TI
+#define Selector_TI_Ldt			4//	; ┛
 //;----------------------------------------------------------------------------
 //全局使用的常量,函数的宏定义
 #define NULL    0

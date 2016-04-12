@@ -32,7 +32,7 @@ org 0x7e00
 KERNEL_SEG_BASE		EQU		0X100000
 DATA_SEG_BASE		EQU 	0X000000
 topOfStack          EQU     0X1000000
-numOfGdts           EQU     0x0000003    
+numOfGdts           EQU     0x0000004    
 ;EndFunctionBlock		各段基地址
 
 
@@ -40,8 +40,8 @@ numOfGdts           EQU     0x0000003
 ;                                    			段基址                段长          属性
 LABEL_GDT        :		Descriptor					0,     		        0,		     0
 LABEL_DESC_CODE32:		Descriptor	  KERNEL_SEG_BASE,             0ffffh,         SegDesc_Property_32 |SegDesc_Property_EXEC_R
-LABEL_DESC_DATA  :      Descriptor   	DATA_SEG_BASE,            0fffffh,         SegDesc_Property_32 |SegDesc_Property_4KB|SegDesc_Property_RW
-
+LABEL_DESC_DATA  :      Descriptor   	DATA_SEG_BASE,            0fffffh,         SegDesc_Property_32 |SegDesc_Property_4KB|SegDesc_Property_RW|SegDesc_Property_DPL3
+LABEL_DESC_STACK :      Descriptor                  0,            0fffffh,         SegDesc_Property_32 |SegDesc_Property_4KB|SegDesc_Property_RW
 
 GdtLen       equ            $-LABEL_GDT                         ;GDT 长度
 GdtPtr                      dw GdtLen - 1                       ;GDT 界限
@@ -52,6 +52,7 @@ GdtPtr                      dw GdtLen - 1                       ;GDT 界限
 ;BeginFunctionBlock		GDT 选择子
 SelectorCode32     equ         LABEL_DESC_CODE32 -LABEL_GDT     ;代码段选择子
 SelectorData       equ         LABEL_DESC_DATA   -LABEL_GDT     ;数据段选择子
+SelectorStack      equ         LABEL_DESC_STACK  -LABEL_GDT     ;堆栈段选择子
 ;EndFunctionBlock		GDT 选择子
 
 LABEL_BEGIN:
@@ -151,9 +152,10 @@ pipelineflush:
 		MOV		AX,SelectorData
 		MOV 	GS,AX
 		MOV		DS,AX
-		MOV		SS,AX
 		MOV		ES,AX
 		MOV		FS,AX
+		MOV		AX,SelectorStack
+		MOV		SS,AX
 		MOV		ESP,topOfStack
 		;将内核拷贝到LABEL_DESC_CODE32段中
 		setMcpySrcDescNum LABEL_SEG_CODE32,KERNEL_SEG_BASE,KERNEL_SIZE
