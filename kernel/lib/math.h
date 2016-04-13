@@ -20,19 +20,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ************************************************************************************/
-#ifndef type_H
-#define type_H
-#define	PUBLIC	
-#define	PRIVATE	static
-
-typedef	unsigned long long	u_int64  ;
-typedef	unsigned int		u_int32  ;
-typedef	unsigned short		u_int16  ;
-typedef	unsigned char		u_int8   ;
-
-typedef long long           int64;
-typedef int                 int32;
-typedef short               int16;
-typedef char                int8 ;
-
+#ifndef tiny_math_H
+#define tiny_math_H
+#define           min(         X      ,Y          )                      \
+                                        ({                     \
+                                           typeof (X) x_ = (X);\  
+                                           typeof (Y) y_ = (Y);\  
+                                           (x_ < y_) ? x_ : y_;\
+			                            })
+#define           max(         X      ,Y          )                      \
+                                        ({                     \
+                                           typeof (X) x_ = (X);\  
+                                           typeof (Y) y_ = (Y);\  
+                                           (x_ > y_) ? x_ : y_;\
+			                            })
 #endif

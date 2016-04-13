@@ -25,16 +25,50 @@
 [BITS 32]						;
 [FILE "naskfunc.nas"]			;
 
-		GLOBAL	_io_hlt         ;void io_hlt(                  );
-		GLOBAL  _setGdt         ;void setGdt(unsigned char*lgdt);
-		GLOBAL _callGate_enter  ;void callGate_enter();
-		GLOBAL _callGate_return ;void callGate_return();
-		GLOBAL _callGate_test
-		GLOBAL _callGate_ring3
-		GLOBAL _move_to_ring3
-		EXTERN _drawNum
+		GLOBAL	_io_hlt         ;void io_hlt (                       );
+		GLOBAL  _setGdt,_setIdt
+		GLOBAL	_io_in8,  _io_in16,  _io_in32
+		GLOBAL	_io_out8, _io_out16, _io_out32
+		GLOBAL  _load_master_maskWord
+		GLOBAL  _load_slave_maskWord
+		GLOBAL  _io_delay
+		GLOBAL  _hander,_sendEOI_Master,_sendEOI_Slave
+		GLOBAL  _open_interrupt
+		EXTERN  _drawNum
+		EXTERN  _time
 [SECTION .text]
-
+_open_interrupt:
+		sti
+		ret
+_sendEOI_Master:
+		MOV		AL,0X20
+		OUT		20H,AL
+		NOP
+		NOP
+		NOP
+		NOP
+		RET
+_sendEOI_Slave:
+		MOV		AL,0X20
+		OUT		0XA0,AL
+		NOP
+		NOP
+		NOP
+		NOP
+		RET
+_hander:
+		CLI
+		PUSH	0X00
+		PUSH	0X3C
+		PUSH	200
+		PUSH	200
+		PUSH	DWORD[_time]
+		CALL    _drawNum
+		ADD		ESP,20
+		INC     DWORD[_time]
+		CALL 	_sendEOI_Master
+		STI
+		IRETD
 _io_hlt:	; void io_hlt(void);
 		PUSH	EBP
 		MOV		EBP,ESP
@@ -53,48 +87,61 @@ _setGdt:
 		PUSH	EDX
 		RETF
 		RET
-_callGate_enter:
+_setIdt:
 		PUSH	EBP
 		MOV		EBP,ESP
-		MOV		EDX,[EBP+8]
-		PUSH	EDX
-		PUSH	0
-		CALL    FAR[ESP]
-		POP		EAX
-		POP		EAX
+		MOV		EAX,[EBP+8]
+		CLI
+		LIDT	[EAX]
 		POP		EBP
 		RET
+_io_in8:	                    ;   int io_in8(int port);
+		MOV		EDX,[ESP+4]		;   port
+		MOV		EAX,0
+		IN		AL,DX
+		RET
+_io_in16:	                    ; int io_in16(int port );
+		MOV		EDX,[ESP+4]		; port
+		MOV		EAX,0
+		IN		AX,DX
+		RET
+_io_in32:	                    ; int io_in32(int port );
+		MOV		EDX,[ESP+4]		; port
+		IN		EAX,DX
+		RET
 
-_callGate_return:
-		RETF
-_callGate_test:
-		PUSH 	0
-		PUSH	0x3C
-		PUSH	700
-		PUSH 	700
-		PUSH	1234
-		CALL    _drawNum
-		ADD		ESP,20
-		RETF
-_callGate_ring3:
-		MOV		EDI,0XE0000000
-		LABEL1:
-		MOV BYTE[EDI],0X1f
-		INC     EDI
-		CMP		EDI,0XE0002048
-		JNE		LABEL1
-		;CALL   DWORD 40+3:0
-		JMP		$
-_move_to_ring3:
-		PUSH	EBP
-		MOV		EBP,ESP
-		MOV		EAX,[EBP+8]  ;CODE
-		MOV		EDX,[EBP+12] ;STACK
-		PUSH	EDX
-		PUSH	0x1000000
-		PUSH	EAX
-		PUSH 	0
-		RETF
+_io_out8:	                    ; void io_out8(int port, int data );
+		MOV		EDX,[ESP+4]		; port
+		MOV		AL,[ESP+8]		; data
+		OUT		DX,AL
+		RET
+
+_io_out16:	                    ; void io_out16(int port, int data);
+		MOV		EDX,[ESP+4]		; port
+		MOV		EAX,[ESP+8]		; data
+		OUT		DX,AX
+		RET
+
+_io_out32:	                    ; void io_out32(int port, int data);
+		MOV		EDX,[ESP+4]		; port
+		MOV		EAX,[ESP+8]		; data
+		OUT		DX,EAX
+		RET
+_io_delay:
+		NOP
+		NOP
+		NOP
+		NOP
+		RET
+_load_master_maskWord:          ;void load load_master_maskWord(u_int8 word);
+		MOV		AL,[ESP+4]
+		OUT		0X21,AL
+	    RET
+_load_slave_maskWord:           ;void load load_slave_maskWord (u_int8 word);
+		MOV		AL,[ESP+4]
+		OUT		0Xa1,AL
+	    RET
+		
 		
 		
 		

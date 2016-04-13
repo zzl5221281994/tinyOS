@@ -24,7 +24,7 @@
 %include "boot\boot_macro.inc    "
 [bits 16]
 org 0x7e00
-%include "boot\memory_map.inc   ";此文件包含获取内存分布图的代码，并将得到的内存分布图数据结构保存在0x701c开始的内存里
+%include "boot\memory_map.inc   ";此文件包含获取内存分布图的代码，并将得到的内存分布图数据结构保存在0x7020开始的内存里
 	JMP		LABEL_BEGIN
 ;BeginFunctionBlock		各段基地址
 ;                                       |1MB~~~~~~5MB|  |5MB~~~~~~~~~~~10MB|   
@@ -32,7 +32,9 @@ org 0x7e00
 KERNEL_SEG_BASE		EQU		0X100000
 DATA_SEG_BASE		EQU 	0X000000
 topOfStack          EQU     0X1000000
-numOfGdts           EQU     0x0000004    
+numOfGdts           EQU     0x0000004
+screenHeight        EQU     768
+screenWidth         EQU     1024  
 ;EndFunctionBlock		各段基地址
 
 
@@ -61,8 +63,8 @@ LABEL_BEGIN:
 		MOV		ES,AX
 		MOV		ECX,[ES:0]
 		MOV		[ES:12d],ECX                         ;boot_info->length_mp
-	    MOV		DWORD[ES:8d ],1024d                  ;boot_info->screen_width
-		MOV		DWORD[ES:4d ],768d                   ;boot_info->screen_height
+	    MOV		DWORD[ES:8d ],screenWidth            ;boot_info->screen_width
+		MOV		DWORD[ES:4d ],screenHeight           ;boot_info->screen_height
 		MOV		DWORD[ES:16d],KERNEL_SEG_BASE        ;boot_info->codeBase
 													 ;boot_info->dataBase 20d
 		MOV		DWORD[ES:24d],LABEL_GDT              ;boot_info->label_gdt
@@ -160,9 +162,11 @@ pipelineflush:
 		;将内核拷贝到LABEL_DESC_CODE32段中
 		setMcpySrcDescNum LABEL_SEG_CODE32,KERNEL_SEG_BASE,KERNEL_SIZE
 		CALL	memcpy
-		;
-		
-		;
+		;TEST
+		;MOV		EAX,[0X7000]
+		;MOV		DWORD[EAX],0X12345678
+		;JMP		$
+		;TEST
 		MOV		EBX,KERNEL_SEG_BASE
 		XOR		ECX,ECX
 		MOV		ECX,[EBX+16]    ;kernel中的数据字节数

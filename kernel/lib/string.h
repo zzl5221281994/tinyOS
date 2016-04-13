@@ -20,19 +20,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ************************************************************************************/
-#ifndef type_H
-#define type_H
-#define	PUBLIC	
-#define	PRIVATE	static
-
-typedef	unsigned long long	u_int64  ;
-typedef	unsigned int		u_int32  ;
-typedef	unsigned short		u_int16  ;
-typedef	unsigned char		u_int8   ;
-
-typedef long long           int64;
-typedef int                 int32;
-typedef short               int16;
-typedef char                int8 ;
-
+#ifndef string_H
+#define string_H
+#include "global.h"
+#define       isDigts(     X                      )     (((X)>='0'&&(X)<='9')?1:0                         )
+#define      isLetter(     X                      )     ((((X)>='a'&&(X)<='z')||((X)>='A'&&(X)<='Z'))?1:0 )
+#define isLowerLetter(     X                      )     (((X)>='a'&&(X)<='z')?1:0                         )
+#define isUpperLetter(     X                      )     (((X)>='A'&&(X)<='Z')?1:0                         )
+extern void intToStr         (u_int32  num,u_int8 *desc,    int32 bufSize					              );
+extern u_int32 strlen        (int8*str                                                                    );
+extern int32 memcpy8         (u_int8*  src,u_int8 *desc,  u_int32 buffSize                                );
+extern int32 memcpy32        (u_int32* src,u_int32*desc,  u_int32 buffSize                                );
 #endif
