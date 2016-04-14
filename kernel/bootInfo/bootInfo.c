@@ -20,11 +20,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ************************************************************************************/
-#include "F:\work\tolset\tinyOS\kernel\lib\global.h   "
-#include "F:\work\tolset\tinyOS\kernel\lib\string.h   "
-#include "F:\work\tolset\tinyOS\kernel\graphics\font.h"
-#include "F:\work\tolset\tinyOS\kernel\kernelFun.h    "
-#include "bootInfo.h                                  "
+#include "F:\work\tolset\tinyOS\kernel\lib\global.h             "
+#include "F:\work\tolset\tinyOS\kernel\lib\string.h             "
+#include "F:\work\tolset\tinyOS\kernel\graphics\font.h          "
+#include "F:\work\tolset\tinyOS\kernel\kernelFun.h              "
+#include "F:\work\tolset\tinyOS\kernel\interrupt\interrupt.h    "
+#include "F:\work\tolset\tinyOS\kernel\debug\debug.h            "
+#include "bootInfo.h                                            "
 extern void   hander();
 PUBLIC int init_bootInfo(                                                                  ){
     u_int8*bp=(u_int8*)bootInfo_Pointer,*mp_ptr=(u_int8*)bootInfo_memMap;
@@ -78,7 +80,23 @@ PUBLIC int init_gdt     (                                                       
 PUBLIC int init_idt     (                                                                  ){
 	u_int8 desc[8];
 	int i;
-	for(i=0;i<256;i++){
+	//int0~int19 CPU异常
+	for(i=0;i<20;i++){
+		gen_gateDescriptor(desc,8,exception_hander[i],0,SegDesc_Property_386IGate);
+		memcpy8(desc,(u_int8*)(&(idt.idtDescriptor[i])),8);
+	}
+	//int20~int 0x1f intel保留
+	for(i=20;i<0x20;i++){
+		gen_gateDescriptor(desc,8,hander,0,SegDesc_Property_386IGate);
+		memcpy8(desc,(u_int8*)(&(idt.idtDescriptor[i])),8);
+	}
+	//int 0x20~int0x2f 可屏蔽硬件中断，来自8259A
+	for(i=0x20;i<=0x2f;i++){
+		gen_gateDescriptor(desc,8,interrupt_hander[i-0x20],0,SegDesc_Property_386IGate);
+		memcpy8(desc,(u_int8*)(&(idt.idtDescriptor[i])),8);
+	}
+	//int 0x30~ int 255 default
+	for(i=0x30;i<256;i++){
 		gen_gateDescriptor(desc,8,hander,0,SegDesc_Property_386IGate);
 		memcpy8(desc,(u_int8*)(&(idt.idtDescriptor[i])),8);
 	}
@@ -96,7 +114,7 @@ PUBLIC int init_idt     (                                                       
 	setIdt(idt.idt_ptr);
 	return TRUE;
 }
-PUBLIC int init_8259A   (                                                                 ){
+PUBLIC int  init_8259A   (                                                                 ){
 	//ICW1 master
 	io_out8(0x20,0x11);
 	io_delay();
@@ -108,7 +126,7 @@ PUBLIC int init_8259A   (                                                       
 	io_out8(0x21,0x20);  //0x20 IRQ0 中断向量号
 	io_delay(); 
 	//ICW2 slave        
-	io_out8(0xa1,0x28); //0x28 IRQ8  中断向量号
+	io_out8(0xa1,0x28); //0x28  IRQ8 中断向量号
 	io_delay();
 	
 	//ICW3 master
@@ -125,9 +143,17 @@ PUBLIC int init_8259A   (                                                       
 	io_out8(0xa1,0x01);
 	io_delay();
 	
-	load_master_maskWord(0xfe);
+	load_master_maskWord(0x00);
 	io_delay();
-	load_slave_maskWord(0xff);
+	load_slave_maskWord(0x00);
 	io_delay();
 	return TRUE;
+}
+PUBLIC void init_pit     (u_int32 timesPerSecond                                           ){
+	io_out8(0x43,0x34);
+	u_int32 value=1193180/timesPerSecond;
+	io_out8(0x40,value&0x000000ff);
+	io_delay();
+	io_out8(0x40,((value&0x0000ff00)>>8));
+	return;
 }

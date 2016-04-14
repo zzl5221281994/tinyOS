@@ -60,9 +60,10 @@ struct bootInfo{
     u_int32    numOfGdts                            ;	
     struct   addr_range_descriptor mp[memory_Map_Length] ;
 };
-extern int init_bootInfo(                                                             );
-extern int init_gdt     (                                                             );
-extern int init_idt     (                                                             );
-extern int init_8259A   (                                                             );
-extern int set_pattle   (                                                             );
+extern  int init_bootInfo(                                                             );
+extern  int init_gdt     (                                                             );
+extern  int init_idt     (                                                             );
+extern  int init_8259A   (                                                             );
+extern void init_pit     (u_int32 timesPerSecond                                       );
+extern  int set_pattle   (                                                             );
 #endif

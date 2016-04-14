@@ -98,5 +98,5 @@ Selector_RPL3		EQU 	3	; ┛
 Selector_TI_Gdt		EQU	0	; ┓TI
 Selector_TI_Ldt		EQU	4	; ┛
 
-KERNEL_SIZE						EQU		12000
+KERNEL_SIZE						EQU		15000
 ;内存分布图数据结构入口

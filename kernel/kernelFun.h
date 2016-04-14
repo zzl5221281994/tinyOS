@@ -23,19 +23,20 @@ SOFTWARE.
 #ifndef kernelFun_H
 #define kernelFun_H
 #include "lib\global.h"
-extern void io_hlt                (                                         );
-extern void setGdt                (u_int8*lgdt                              );
-extern void setIdt                (u_int8*lidt                              );
-extern void io_in8                (u_int32 port                             );
-extern void io_in16               (u_int32 port                             );
-extern void io_in32               (u_int32 port                             );
-extern void io_out8               (u_int32 port,u_int32 data                );
-extern void io_out16              (u_int32 port,u_int32 data                );
-extern void io_out32              (u_int32 port,u_int32 data                );
-extern void load_master_maskWord  (u_int8 word                              );
-extern void load_slave_maskWord   (u_int8 word                              );
-extern void io_delay              (                                         );
-extern void sendEOI_Master        (                                         );
-extern void sendEOI_Slave         (                                         );
-extern void open_interrupt        (                                         );
+extern void    io_hlt                (                                         );
+extern void    setGdt                (u_int8*lgdt                              );
+extern void    setIdt                (u_int8*lidt                              );
+extern u_int8  io_in8                (u_int32 port                             );
+extern u_int16 io_in16               (u_int32 port                             );
+extern u_int32 io_in32               (u_int32 port                             );
+extern void    io_out8               (u_int32 port,u_int32 data                );
+extern void    io_out16              (u_int32 port,u_int32 data                );
+extern void    io_out32              (u_int32 port,u_int32 data                );
+extern void    load_master_maskWord  (u_int8 word                              );
+extern void    load_slave_maskWord   (u_int8 word                              );
+extern void    io_delay              (                                         );
+extern void    sendEOI_Master        (                                         );
+extern void    sendEOI_Slave         (                                         );
+extern void    open_interrupt        (                                         );
+extern void    close_interrupt       (                                         );
 #endif

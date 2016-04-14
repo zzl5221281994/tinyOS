@@ -1,5 +1,5 @@
 /************************************************************************************
-Wed Apr 13 15:38:40 2016
+Thu Apr 14 10:11:45 2016
 
 MIT License
 Copyright (c) 2016 zhuzuolang
@@ -20,12 +20,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ************************************************************************************/
-#ifndef interrupt_H
-#define interrupt_H
-#include "F:\work\tolset\tinyOS\kernel\lib\global.h       "
-//CPU exception
-extern u_int32 exception_hander[];
-extern u_int32 interrupt_hander[];
-extern u_int32 getErrorCode   (                    );
-extern void    sys__IRQ_hander(                    );
+#ifndef debug_H
+#define debug_H
+#include "F:\work\tolset\tinyOS\kernel\lib\global.h   "
+extern void sys_exception_panic(u_int32 errorCode,u_int32 vectorNo);
+extern void sys_panic          (                                  );
 #endif
