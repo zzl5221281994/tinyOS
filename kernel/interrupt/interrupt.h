@@ -28,4 +28,23 @@ extern u_int32 exception_hander[];
 extern u_int32 interrupt_hander[];
 extern u_int32 getErrorCode   (                    );
 extern void    sys__IRQ_hander(                    );
+
+extern void IRQ0_clock        (                    );
+extern void IRQ1_keyBoard     (                    );
+extern void IRQ2_slave        (                    );
+extern void IRQ3_port2        (                    );
+extern void IRQ4_port1        (                    );
+extern void IRQ5_LPT2         (                    );
+extern void IRQ6_floppyDisk   (                    );
+extern void IRQ7_LPT1         (                    );
+
+//slave
+extern void IRQ8_CMOS         (                    );
+extern void IRQ9_redirect_IRQ2(                    );
+extern void IRQ10_reserved1   (                    );
+extern void IRQ11_reserved2   (                    );
+extern void IRQ12_PS2Mouse    (                    );
+extern void IRQ13_FPU_error   (                    );
+extern void IRQ14_ATDisk      (                    );
+extern void IRQ15_reserved3   (                    );
 #endif

@@ -143,9 +143,9 @@ PUBLIC int  init_8259A   (                                                      
 	io_out8(0xa1,0x01);
 	io_delay();
 	
-	load_master_maskWord(0x00);
+	load_master_maskWord(0xfc);
 	io_delay();
-	load_slave_maskWord(0x00);
+	load_slave_maskWord(0xff);
 	io_delay();
 	return TRUE;
 }

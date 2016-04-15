@@ -104,89 +104,70 @@ PRIVATE void SIMD_exception                 (void){
 
 //PIC interrupt
 // master 8259A
-PRIVATE void IRQ0_clock                     (void){
-	close_interrupt();
+//EAX,ECX,EDX,EBX,ESP,EBP,ESI和EDI
+PUBLIC void IRQ0_clock1                     (void){
 	global_clock++;
-	//drawNum(global_clock,boot_info.screen_height-16,boot_info.screen_width-80,0x1f,0x00);
 	drawNum(global_clock,400,boot_info.screen_width-80,0x1f,0x00);
-	sendEOI_Master ();
-	open_interrupt();
-	sys__IRQ_hander();
+	sendEOI_Master();
 }
-PRIVATE void IRQ1_keyBoard                  (void){
-	close_interrupt();
+PUBLIC void IRQ1_keyBoard1                  (void){
 	u_int8 byte=io_in8(0x60);
 	keyBoard_inPut_buf[keyBoard_bufLen++]=byte;
+	if(keyBoard_bufLen>MAX_KEYBOARD_BUF)
+		keyBoard_bufLen=0;
 	keyBoard_inPut_buf[keyBoard_bufLen]='\0';
-	//drawStr(keyBoard_inPut_buf,600,0,0x1f,0x00);
 	sendEOI_Master ();
-	open_interrupt();
-	sys__IRQ_hander();
 }
-PRIVATE void IRQ2_slave                     (void){
+PUBLIC void IRQ2_slave1                     (void){
 	sendEOI_Master ();
-	sys__IRQ_hander();
 }
-PRIVATE void IRQ3_port2                     (void){
+PUBLIC void IRQ3_port21                     (void){
 	sendEOI_Master ();
-	sys__IRQ_hander();
 }
-PRIVATE void IRQ4_port1                     (void){
+PUBLIC void IRQ4_port11                     (void){
 	sendEOI_Master ();
-	sys__IRQ_hander();
 }
-PRIVATE void IRQ5_LPT2                      (void){
+PUBLIC void IRQ5_LPT21                      (void){
 	sendEOI_Master ();
-	sys__IRQ_hander();
 }
-PRIVATE void IRQ6_floppyDisk                (void){
+PUBLIC void IRQ6_floppyDisk1                (void){
 	sendEOI_Master ();
-	sys__IRQ_hander();
 }
-PRIVATE void IRQ7_LPT1                      (void){
+PUBLIC void IRQ7_LPT11                      (void){
 	sendEOI_Master ();
-	sys__IRQ_hander();
 }
 // slave 8259A
-PRIVATE void IRQ8_CMOS                      (void){
+PUBLIC void IRQ8_CMOS1                      (void){
 	sendEOI_Slave  ();
 	sendEOI_Master ();
-	sys__IRQ_hander();
 }
-PRIVATE void IRQ9_redirect_IRQ2             (void){
+PUBLIC void IRQ9_redirect_IRQ21             (void){
 	sendEOI_Slave  ();
 	sendEOI_Master ();
-	sys__IRQ_hander();
 }
-PRIVATE void IRQ10_reserved1                (void){
+PUBLIC void IRQ10_reserved11                (void){
 	sendEOI_Slave  ();
 	sendEOI_Master ();
-	sys__IRQ_hander();
 }
-PRIVATE void IRQ11_reserved2                (void){
+PUBLIC void IRQ11_reserved21                (void){
 	sendEOI_Slave  ();
 	sendEOI_Master ();
-	sys__IRQ_hander();
 }
-PRIVATE void IRQ12_PS2Mouse                 (void){
+PUBLIC void IRQ12_PS2Mouse1                 (void){
 	sendEOI_Slave  ();
 	sendEOI_Master ();
-	sys__IRQ_hander();
 }
-PRIVATE void IRQ13_FPU_error                (void){
+PUBLIC void IRQ13_FPU_error1                (void){
 	sendEOI_Slave  ();
 	sendEOI_Master ();
-	sys__IRQ_hander();
 }
-PRIVATE void IRQ14_ATDisk                   (void){
+PUBLIC void IRQ14_ATDisk1                   (void){
 	sendEOI_Slave  ();
 	sendEOI_Master ();
-	sys__IRQ_hander();
 }
-PRIVATE void IRQ15_reserved3                (void){
+PUBLIC void IRQ15_reserved31                (void){
 	sendEOI_Slave  ();
 	sendEOI_Master ();
-	sys__IRQ_hander();
 }
 
 //异常处理指针数组
