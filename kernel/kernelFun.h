@@ -39,4 +39,8 @@ extern void    sendEOI_Master        (                                         )
 extern void    sendEOI_Slave         (                                         );
 extern void    open_interrupt        (                                         );
 extern void    close_interrupt       (                                         );
+extern void    loadTss               (                                         );
+extern void    loadLdt               (                                         );
+extern void    loadReg               (u_int32 eip,u_int32 cs,u_int32 esp,u_int32 ss,u_int32 eax,  u_int32 ecx,u_int32 edx,u_int32 ebx,u_int32 ebp,u_int32 esi,u_int32 edi,u_int32 eflags);
+extern void    runProcess            (                                         );
 #endif

@@ -20,6 +20,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ************************************************************************************/
+#include "F:\work\tolset\tinyOS\kernel\lib\string.h          "
+#include "F:\work\tolset\tinyOS\kernel\bootInfo\bootInfo.h   "
 #include "global.h"
 /*
 %macro Descriptor 3
@@ -56,4 +58,11 @@ PUBLIC void   gen_gateDescriptor(u_int8 desc[8],u_int32 Selector,u_int32 offset,
 	desc[6]=(offset&0x00ff0000)>>16;
 	desc[7]=(offset&0xff000000)>>24;
 	
+}
+PUBLIC int32 addDes             (u_int32 base,u_int32 limit,u_int32 attribute                                   ){
+	u_int8 desc[8];
+	gen_normalDescriptor(desc,base,limit,attribute);
+	memcpy8(desc,(u_int8*)(&(gdt.gdtDescriptor[gdt.gdtDescriptor_length])),8);
+	gdt.gdtDescriptor_length++;
+	return gdt.gdtDescriptor_length-1;
 }

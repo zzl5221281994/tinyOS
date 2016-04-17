@@ -37,7 +37,7 @@ struct proc_table{
 	
 	u_int32 priority                   ;//进程优先级
 	u_int32 status                     ;
-	u_int8  ldtDescriptor[MAX_LDT][8]  ;//ldt描述符
+	u_int8  ldtDescriptor[MAX_LDT][8]  ;//ldt描述符   code-data-stack
 	int8    p_name[MAX_PROCESS_NAME]   ;//进程名
 };
 struct TSS{
@@ -50,7 +50,7 @@ struct TSS{
 	u_int32	ss2     ;
 	u_int32	cr3     ;
 	u_int32	eip     ;
-	u_int32	flags   ;
+	u_int32	eflags  ;
 	u_int32	eax     ;
 	u_int32	ecx     ;
 	u_int32	edx     ;
@@ -69,5 +69,8 @@ struct TSS{
 	u_int16	trap    ;
 	u_int16	iobase  ;//I/O位图基址大于或等于TSS段界限，就表示没有I/O许可位图 
 };
+extern u_int32 current_exec_pid;
 extern void init_tss();
+extern void storeFrame(u_int32 frame[]);
+extern int32 createProcess();
 #endif

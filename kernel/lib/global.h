@@ -97,6 +97,11 @@ CRO:
 
 #define Selector_TI_Gdt			0//	; ┓TI
 #define Selector_TI_Ldt			4//	; ┛
+
+#define KERNEL_CODE_INDEX       1
+#define KERNEL_DATA_INDEX       2
+#define KERNEL_STACK_INDEX      3
+#define KERNEL_TSS_INDEX        4
 //;----------------------------------------------------------------------------
 //全局使用的常量,函数的宏定义
 #define NULL    0
@@ -113,4 +118,5 @@ extern u_int8           *vram8 ;
 extern u_int32          *vram32;
 extern void gen_normalDescriptor(u_int8 desc[8],u_int32 base    ,u_int32 limit ,u_int32 attribute                         );
 extern void   gen_gateDescriptor(u_int8 desc[8],u_int32 Selector,u_int32 offset,u_int32 DCount,u_int32 attribute          );
+extern int32 addDes             (u_int32 base,u_int32 limit,u_int32 attribute                                             );
 #endif

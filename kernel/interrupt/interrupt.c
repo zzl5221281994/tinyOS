@@ -26,6 +26,7 @@ SOFTWARE.
 #include "F:\work\tolset\tinyOS\kernel\kernelFun.h           "
 #include "F:\work\tolset\tinyOS\kernel\graphics\font.h       "
 #include "F:\work\tolset\tinyOS\kernel\IO\IO.h               "
+#include "F:\work\tolset\tinyOS\kernel\multiTask\process.h   "
 #include "interrupt.h                                        "
 #include "clock.h                                            "
 #define EXCEPTION_HANDERS_NUM 20
@@ -105,10 +106,13 @@ PRIVATE void SIMD_exception                 (void){
 //PIC interrupt
 // master 8259A
 //EAX,ECX,EDX,EBX,ESP,EBP,ESI和EDI
+PUBLIC u_int32 tempFrame[13];
 PUBLIC void IRQ0_clock1                     (void){
 	global_clock++;
+	getFrame(tempFrame);
 	drawNum(global_clock,400,boot_info.screen_width-80,0x1f,0x00);
 	sendEOI_Master();
+	storeFrame(tempFrame);
 }
 PUBLIC void IRQ1_keyBoard1                  (void){
 	u_int8 byte=io_in8(0x60);

@@ -31,11 +31,34 @@
 		GLOBAL	_io_out8, _io_out16, _io_out32
 		GLOBAL  _load_master_maskWord
 		GLOBAL  _load_slave_maskWord
+		GLOBAL  _loadTss,_loadLdt,_loadReg,_runProcess
 		GLOBAL  _io_delay
 		GLOBAL  _hander,_sendEOI_Master,_sendEOI_Slave
 		GLOBAL  _open_interrupt,_close_interrupt
 		EXTERN  _drawNum
 [SECTION .text]
+_loadReg:
+		MOV		EAX,[ESP+48]
+		PUSH	EAX
+		POPFD
+		MOV		EAX,[ESP+20]
+		MOV		ECX,[ESP+24]
+		MOV		EDX,[ESP+28]
+		MOV		EBX,[ESP+32]
+		MOV		EBP,[ESP+36]
+		MOV		ESI,[ESP+40]
+		MOV		EDI,[ESP+44]
+		ADD     ESP,4
+		RETF
+_runProcess:
+		ADD    ESP,4
+		RETF
+_loadTss:
+		LTR [ESP+4]
+		RET
+_loadLdt:
+		LLDT [ESP+4]
+		RET
 _open_interrupt:
 		STI
 		POP		EAX

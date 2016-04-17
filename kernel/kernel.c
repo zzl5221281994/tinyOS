@@ -26,6 +26,7 @@ SOFTWARE.
 #include "bootInfo\bootInfo.h  "
 #include "kernelFun.h          "
 #include "interrupt\interrupt.h"
+#include "multiTask\process.h  "
 #include "IO\IO.h              "
 PUBLIC struct bootInfo boot_info;
 PUBLIC struct main_gdt       gdt;
@@ -34,64 +35,48 @@ PUBLIC u_int8  *vram8 =NULL     ;
 PUBLIC u_int32 *vram32=NULL     ;
 PUBLIC u_int32 time=0           ;
 //static u_int8* tinyOS_str1="\nWed Mar 30 22 50 57 2016\n\nMIT License\nCopyright c 2016 zhuzuolang\n\nPermission is hereby granted free of charge to any person obtaining a copy\nof this software and associated documentation files the Software to deal\nin the Software without restriction including without limitation the rights\nto use copy modify merge publish distribute sublicense and or sell\ncopies of the Software and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software \nTHE SOFTWARE IS PROVIDED AS IS WITHOUT WARRANTY OF ANY KIND EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY WHETHER IN AN ACTION OF CONTRACT TORT OR OTHERWISE ARISING FROM \nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE\n\nWed Mar 30 22 50 57 2016\n\nMIT License\nCopyright c 2016 zhuzuolang\n\nPermission is hereby granted free of charge to any person obtaining a copy\nof this software and associated documentation files the Software to deal\nin the Software without restriction including without limitation the rights\nto use copy modify merge publish distribute sublicense and or sell\ncopies of the Software and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software \nTHE SOFTWARE IS PROVIDED AS IS WITHOUT WARRANTY OF ANY KIND EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY WHETHER IN AN ACTION OF CONTRACT TORT OR OTHERWISE ARISING FROM \nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE\n";
-int32 addDes(u_int32 base,u_int32 limit,u_int32 attribute){
-	u_int8 desc[8];
-	gen_normalDescriptor(desc,base,limit,attribute);
-	memcpy8(desc,(u_int8*)(&(gdt.gdtDescriptor[gdt.gdtDescriptor_length])),8);
-	gdt.gdtDescriptor_length++;
-	return gdt.gdtDescriptor_length-1;
-}
-extern void error_test();
 void drawInfo();
 void HariMain(void)
 {
-	init_bootInfo();
+	init_bootInfo();                  //启动信息
 	vram8 =(u_int8*)boot_info.vram  ;
 	vram32=(u_int32* )boot_info.vram;
 	init_gdt();
 	init_idt();
-	init_8259A();
-	init_pit(50);
-	open_interrupt();
-	io_delay();
+	init_8259A();                   
+	init_pit(50);                    //设置每秒时钟中断次数
+	init_tss();
+    createProcess(1);
+    createProcess(2);	
 	drawInfo();
-	//addDes(boot_info.codeBase+testA,0xffff,SegDesc_Property_32|SegDesc_Property_EXEC_R|SegDesc_Property_DPL0);
-	//addDes(boot_info.codeBase+testB,0xffff,SegDesc_Property_32|SegDesc_Property_EXEC_R|SegDesc_Property_DPL0);
-	/*while(1)
-	{
-		u_int32 len=strlen(keyBoard_inPut_buf);
-		if(len>1000)
-			drawNum(12345,500,0,0x00,0x00);
-		else
-			drawNum(len,500,0,0x3c,0x00);
-		drawStr(keyBoard_inPut_buf,600,0,0x3c,0x00);
-		io_hlt();
-	}*/
+	open_interrupt();
 	while(1)
 		io_hlt();
-}
-void delay(){
-	int i,j,key=0;
-	for(i=0;i<1000;i++)
-		for(j=0;j<10000;j++)
-			   key+=i+j;
 }
 void testA(){
-	int i=0;
+	int l=0;
 	while(1)
 	{
-		drawStr("A",500+i/1024,i%1024,0x3c,0x00);
-		delay();
-		i+=8;
+		*(vram32+l)=0x2e2e2e2e;
+		//delay();
+		int i,j,key=0;
+	for(i=0;i<100;i++)
+		for(j=0;j<10000;j++)
+			   key+=i+j;
+		l++;
 	}
 }
 void testB(){
-	int i=0;
+	int l=0;
 	while(1)
 	{
-		drawStr("B",500+i/1024,i%1024,0x3c,0x00);
-		delay();
-		i+=8;
+		*(vram32+1024*400+l)=0x1f1f1f1f;
+		//delay();
+		int i,j,key=0;
+	for(i=0;i<100;i++)
+		for(j=0;j<10000;j++)
+			   key+=i+j;
+		l++;
 	}
 }
 void drawInfo(){

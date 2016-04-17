@@ -34,6 +34,11 @@ entry:
 		MOV		AH,2
 		INT 	13H
 		JC		err
+		setReadBuff 0x0c40,0x0000     	  ;setReadBuff
+		setCHS  1d,0,1d,18				  ;setCHS Cylinder,head,sector,sector number
+		MOV		AH,2
+		INT 	13H
+		JC		err
 		JMP     0x7e00
 err:
 		MOV		AX,CS
