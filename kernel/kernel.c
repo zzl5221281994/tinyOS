@@ -44,11 +44,12 @@ void HariMain(void)
 	init_gdt();
 	init_idt();
 	init_8259A();                   
-	init_pit(50);                    //设置每秒时钟中断次数
+	init_pit(100);                    //设置每秒时钟中断次数
 	init_tss();
-    createProcess(1);
-    createProcess(2);	
-	drawInfo();
+	createProcess(3,1);
+	createProcess(2,1);
+	createProcess(1,1);	
+	//drawInfo();
 	open_interrupt();
 	while(1)
 		io_hlt();
@@ -60,7 +61,7 @@ void testA(){
 		*(vram32+l)=0x2e2e2e2e;
 		//delay();
 		int i,j,key=0;
-	for(i=0;i<100;i++)
+	for(i=0;i<20;i++)
 		for(j=0;j<10000;j++)
 			   key+=i+j;
 		l++;
@@ -70,10 +71,23 @@ void testB(){
 	int l=0;
 	while(1)
 	{
-		*(vram32+1024*400+l)=0x1f1f1f1f;
+		*(vram32+1024*100+l)=0x1f1f1f1f;
 		//delay();
 		int i,j,key=0;
-	for(i=0;i<100;i++)
+	for(i=0;i<20;i++)
+		for(j=0;j<10000;j++)
+			   key+=i+j;
+		l++;
+	}
+}
+void testC(){
+	int l=0;
+	while(1)
+	{
+		*(vram32+1024*150+l)=0x3c3c3c3c;
+		//delay();
+		int i,j,key=0;
+	for(i=0;i<20;i++)
 		for(j=0;j<10000;j++)
 			   key+=i+j;
 		l++;

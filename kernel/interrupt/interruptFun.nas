@@ -25,46 +25,63 @@
 [BITS 32]						;
 [FILE "interrupt.nas"]			;
 
-		GLOBAL _getErrorCode,_getFrame
+		GLOBAL _getErrorCode
 		GLOBAL _IRQ0_clock,_IRQ1_keyBoard,_IRQ2_slave,_IRQ3_port2,_IRQ4_port1,_IRQ5_LPT2,_IRQ6_floppyDisk,_IRQ7_LPT1
 		GLOBAL _IRQ8_CMOS ,_IRQ9_redirect_IRQ2,_IRQ10_reserved1,_IRQ11_reserved2,_IRQ12_PS2Mouse,_IRQ13_FPU_error,_IRQ14_ATDisk,_IRQ15_reserved3
         EXTERN _IRQ0_clock1,_IRQ1_keyBoard1,_IRQ2_slave1,_IRQ3_port21,_IRQ4_port11,_IRQ5_LPT21,_IRQ6_floppyDisk1,_IRQ7_LPT11
 		EXTERN _IRQ8_CMOS1,_IRQ9_redirect_IRQ21,_IRQ10_reserved11,_IRQ11_reserved21,_IRQ12_PS2Mouse1,_IRQ13_FPU_error1,_IRQ14_ATDisk1,_IRQ15_reserved31
+        EXTERN _process_table,_current_exec_pid
 [SECTION .text]
 _getErrorCode:
 		MOV		EAX,[ESP+4]
 		RET
-_getFrame:
-		MOV		EBP,[ESP+4] ;tempFrame
-		MOV		EAX,[ESP+12];EDI
-		MOV		[EBP],EAX
-		MOV		EAX,[ESP+16];DSI
-		MOV		[EBP+4],EAX
-		MOV		EAX,[ESP+20];EBP
-		MOV		[EBP+8],EAX
-		MOV		EAX,[ESP+24];ESP
-		MOV		[EBP+12],EAX
-		MOV		EAX,[ESP+28];EBX
-		MOV		[EBP+16],EAX
-		MOV		EAX,[ESP+32];EDX
-		MOV		[EBP+20],EAX
-		MOV		EAX,[ESP+36];ECX
-		MOV		[EBP+24],EAX
-		MOV		EAX,[ESP+40];EAX
-		MOV		[EBP+28],EAX
-		MOV		EAX,[ESP+44];EIP
-		MOV		[EBP+32],EAX
-		MOV		EAX,[ESP+48];CS
-		MOV		[EBP+36],EAX
-		MOV		EAX,[ESP+52];EFLAGS
-		MOV		[EBP+40],EAX
-		MOV		EAX,[ESP+56];ESP
-		MOV		[EBP+44],EAX
-		MOV		EAX,[ESP+60];SS
-		MOV		[EBP+48],EAX
-		RET
 _IRQ0_clock:
 		PUSHAD
+		;得到
+		MOV		EAX,136
+		MUL     DWORD[_current_exec_pid]
+		ADD 	EAX,_process_table
+		ADD		EAX,16
+		
+		MOV		EBX,[ESP+48]
+		MOV		[EAX],EBX
+		
+		MOV		EBX,[ESP+44]
+		MOV		[EAX+4],EBX
+		
+		MOV		EBX,[ESP+40]
+		MOV		[EAX+8],EBX
+		
+		MOV		EBX,[ESP+36]
+		MOV		[EAX+12],EBX
+		
+		MOV		EBX,[ESP+32]
+		MOV		[EAX+16],EBX
+		
+		MOV		EBX,[ESP+28]
+		MOV		[EAX+20],EBX
+		
+		MOV		EBX,[ESP+24]
+		MOV		[EAX+24],EBX
+		
+		MOV		EBX,[ESP+20]
+		MOV		[EAX+28],EBX
+		
+		MOV		EBX,[ESP+16]
+		MOV		[EAX+32],EBX
+		
+		MOV		EBX,[ESP+12]
+		MOV		[EAX+36],EBX
+		
+		MOV		EBX,[ESP+8]
+		MOV		[EAX+40],EBX
+		
+		MOV		EBX,[ESP+4]
+		MOV		[EAX+44],EBX
+	
+		MOV		EBX,[ESP]
+		MOV		[EAX+48],EBX
+		
 		CALL _IRQ0_clock1
 		POPAD
 		IRETD

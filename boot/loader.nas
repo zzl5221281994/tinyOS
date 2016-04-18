@@ -152,10 +152,7 @@ SUCCEED:
 		JMP     pipelineflush
 pipelineflush:
 		MOV		AX,SelectorData
-		MOV 	GS,AX
 		MOV		DS,AX
-		MOV		ES,AX
-		MOV		FS,AX
 		MOV		AX,SelectorStack
 		MOV		SS,AX
 		MOV		ESP,topOfStack

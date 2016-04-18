@@ -49,6 +49,7 @@ _loadReg:
 		MOV		ESI,[ESP+40]
 		MOV		EDI,[ESP+44]
 		ADD     ESP,4
+		STI
 		RETF
 _runProcess:
 		ADD    ESP,4
