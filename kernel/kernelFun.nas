@@ -29,31 +29,40 @@
 		GLOBAL  _setGdt,_setIdt
 		GLOBAL	_io_in8,  _io_in16,  _io_in32
 		GLOBAL	_io_out8, _io_out16, _io_out32
+		GLOBAL  _io_delay
+		GLOBAL  _port_read,_port_write
+		
 		GLOBAL  _load_master_maskWord
 		GLOBAL  _load_slave_maskWord
 		GLOBAL  _loadTss,_loadLdt,_loadReg,_runProcess
-		GLOBAL  _io_delay
 		GLOBAL  _hander,_sendEOI_Master,_sendEOI_Slave
 		GLOBAL  _open_interrupt,_close_interrupt
-		EXTERN  _drawNum
+		
+		EXTERN _clock_mutex
 [SECTION .text]
 _loadReg:
-		MOV		EAX,[ESP+48]
-		PUSH	EAX
-		POPFD
-		MOV		EAX,[ESP+20]
-		MOV		ECX,[ESP+24]
-		MOV		EDX,[ESP+28]
-		MOV		EBX,[ESP+32]
-		MOV		EBP,[ESP+36]
-		MOV		ESI,[ESP+40]
-		MOV		EDI,[ESP+44]
-		ADD     ESP,4
-		STI
-		RETF
-_runProcess:
-		ADD    ESP,4
-		RETF
+		;MOV		EAX,[ESP+48]
+		;PUSH	EAX
+		;POPFD
+		;MOV		EAX,[ESP+20]
+		;MOV		ECX,[ESP+24]
+		;MOV		EDX,[ESP+28]
+		;MOV		EBX,[ESP+32]
+		;MOV		EBP,[ESP+36]
+		;MOV		ESI,[ESP+40]
+		;MOV		EDI,[ESP+44]
+		;ADD     ESP,4
+		;STI
+		;RETF
+		MOV		EAX,[ESP+24]
+		MOV		ECX,[ESP+28]
+		MOV		EDX,[ESP+32]
+		MOV		EBX,[ESP+36]
+		MOV		EBP,[ESP+40]
+		MOV		ESI,[ESP+44]
+		MOV		EDI,[ESP+48]
+		ADD		ESP,4
+		IRETD
 _loadTss:
 		LTR [ESP+4]
 		RET
@@ -146,6 +155,29 @@ _io_out32:	                    ; void io_out32(int port, int data);
 		MOV		EDX,[ESP+4]		; port
 		MOV		EAX,[ESP+8]		; data
 		OUT		DX,EAX
+		RET
+; ========================================================================
+;                  void port_read(u16 port, void* buf, int n);
+; ========================================================================
+_port_read:
+	    MOV	EDX, [ESP + 4]	; port
+		MOV	EDI, [ESP + 8]	; buf
+		MOV	ECX, [ESP + 12]	; n
+		SHR ECX, 1
+		CLD
+		REP INSW
+		RET
+
+; ========================================================================
+;                  void port_write(u16 port, void* buf, int n);
+; ========================================================================
+_port_write:
+		MOV	EDX, [ESP+4]		; port
+		MOV ESI, [ESP+8]	; buf
+		MOV	ECX, [ESP+12]	; n
+		SHR ECX, 1
+		CLD
+		REP OUTSW
 		RET
 _io_delay:
 		NOP

@@ -80,23 +80,32 @@ PUBLIC int init_gdt     (                                                       
 PUBLIC int init_idt     (                                                                  ){
 	u_int8 desc[8];
 	int i;
-	//int0~int19 CPU异常
+	//int0~int19                   CPU异常
 	/*for(i=0;i<20;i++){
 		gen_gateDescriptor(desc,8,exception_hander[i],0,SegDesc_Property_386IGate);
 		memcpy8(desc,(u_int8*)(&(idt.idtDescriptor[i])),8);
 	}*/
-	//int20~int 0x1f intel保留
+	//int20~int 0x1f               intel保留
 	for(i=20;i<0x20;i++){
 		gen_gateDescriptor(desc,8,hander,0,SegDesc_Property_386IGate);
 		memcpy8(desc,(u_int8*)(&(idt.idtDescriptor[i])),8);
 	}
-	//int 0x20~int0x2f 可屏蔽硬件中断，来自8259A
+	//int 0x20~int0x2f             可屏蔽硬件中断，来自8259A
 	for(i=0x20;i<=0x2f;i++){
 		gen_gateDescriptor(desc,8,interrupt_hander[i-0x20],0,SegDesc_Property_386IGate);
 		memcpy8(desc,(u_int8*)(&(idt.idtDescriptor[i])),8);
 	}
-	//int 0x30~ int 255 default
-	for(i=0x30;i<256;i++){
+	//int 0x30~ int 0x87           默认
+	for(i=0x30;i<0x88;i++){
+		gen_gateDescriptor(desc,8,hander,0,SegDesc_Property_386IGate);
+		memcpy8(desc,(u_int8*)(&(idt.idtDescriptor[i])),8);
+	}
+	//int 0x88                     系统调用
+	gen_gateDescriptor(desc,8,sys_call,0,SegDesc_Property_386IGate|SegDesc_Property_DPL3);
+	memcpy8(desc,(u_int8*)(&(idt.idtDescriptor[0x88])),8);
+	
+	//int 0x89~ int 255            默认
+	for(i=0x88+1;i<256;i++){
 		gen_gateDescriptor(desc,8,hander,0,SegDesc_Property_386IGate);
 		memcpy8(desc,(u_int8*)(&(idt.idtDescriptor[i])),8);
 	}
@@ -143,9 +152,9 @@ PUBLIC int  init_8259A   (                                                      
 	io_out8(0xa1,0x01);
 	io_delay();
 	
-	load_master_maskWord(0xfe);
+	load_master_maskWord(0xf9);
 	io_delay();
-	load_slave_maskWord(0xff);
+	load_slave_maskWord(0xbd);
 	io_delay();
 	return TRUE;
 }

@@ -24,25 +24,33 @@
 [INSTRSET "i486p"]				;
 [BITS 32]						;
 [FILE "interrupt.nas"]			;
-
 		GLOBAL _getErrorCode
+		GLOBAL _get_clock
 		GLOBAL _IRQ0_clock,_IRQ1_keyBoard,_IRQ2_slave,_IRQ3_port2,_IRQ4_port1,_IRQ5_LPT2,_IRQ6_floppyDisk,_IRQ7_LPT1
 		GLOBAL _IRQ8_CMOS ,_IRQ9_redirect_IRQ2,_IRQ10_reserved1,_IRQ11_reserved2,_IRQ12_PS2Mouse,_IRQ13_FPU_error,_IRQ14_ATDisk,_IRQ15_reserved3
-        EXTERN _IRQ0_clock1,_IRQ1_keyBoard1,_IRQ2_slave1,_IRQ3_port21,_IRQ4_port11,_IRQ5_LPT21,_IRQ6_floppyDisk1,_IRQ7_LPT11
+        GLOBAL _sys_call
+		
+		EXTERN _IRQ0_clock1,_IRQ1_keyBoard1,_IRQ2_slave1,_IRQ3_port21,_IRQ4_port11,_IRQ5_LPT21,_IRQ6_floppyDisk1,_IRQ7_LPT11
 		EXTERN _IRQ8_CMOS1,_IRQ9_redirect_IRQ21,_IRQ10_reserved11,_IRQ11_reserved21,_IRQ12_PS2Mouse1,_IRQ13_FPU_error1,_IRQ14_ATDisk1,_IRQ15_reserved31
-        EXTERN _process_table,_current_exec_pid
+        EXTERN _interrupt_mutex
+		EXTERN _process_table,_current_exec_pid
+        EXTERN _sys_call_table
 [SECTION .text]
+_get_clock:
+		MOV		EAX,0
+		INT 	0X88
+		JMP		_get_clock
 _getErrorCode:
 		MOV		EAX,[ESP+4]
 		RET
 _IRQ0_clock:
 		PUSHAD
-		;得到
+		;得到进程表stackFrame的偏移
 		MOV		EAX,136
 		MUL     DWORD[_current_exec_pid]
 		ADD 	EAX,_process_table
 		ADD		EAX,16
-		
+		;保存现场信息
 		MOV		EBX,[ESP+48]
 		MOV		[EAX],EBX
 		
@@ -83,8 +91,6 @@ _IRQ0_clock:
 		MOV		[EAX+48],EBX
 		
 		CALL _IRQ0_clock1
-		POPAD
-		IRETD
 _IRQ1_keyBoard:
 		PUSHAD
 		CALL _IRQ1_keyBoard1
@@ -160,4 +166,11 @@ _IRQ15_reserved3:
 		PUSHAD
 		CALL _IRQ15_reserved31
 		POPAD
+		IRETD
+		
+;系统调用	
+_sys_call:
+		MOV		EBX,4
+		MUL		EBX
+		CALL 	[_sys_call_table+EAX]
 		IRETD

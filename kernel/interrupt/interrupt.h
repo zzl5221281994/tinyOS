@@ -23,12 +23,12 @@ SOFTWARE.
 #ifndef interrupt_H
 #define interrupt_H
 #include "F:\work\tolset\tinyOS\kernel\lib\global.h       "
-//CPU exception
+//CPU   异常处理
 extern u_int32 exception_hander[];
+//8259A 中断处理
 extern u_int32 interrupt_hander[];
 extern u_int32 getErrorCode   (                    );
-extern void    sys__IRQ_hander(                    );
-
+//master
 extern void IRQ0_clock        (                    );
 extern void IRQ1_keyBoard     (                    );
 extern void IRQ2_slave        (                    );
@@ -47,4 +47,7 @@ extern void IRQ12_PS2Mouse    (                    );
 extern void IRQ13_FPU_error   (                    );
 extern void IRQ14_ATDisk      (                    );
 extern void IRQ15_reserved3   (                    );
+
+//系统调用
+extern void sys_call          (                    );    
 #endif

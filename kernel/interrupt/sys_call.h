@@ -1,5 +1,5 @@
 /************************************************************************************
-Tue Apr 19 10:30:43 2016
+Tue Apr 19 10:32:53 2016
 
 MIT License
 Copyright (c) 2016 zhuzuolang
@@ -20,9 +20,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ************************************************************************************/
-#ifndef clock_H
-#define clock_H
-#include "F:\work\tolset\tinyOS\kernel\lib\global.h       "
-extern u_int32 global_clock;
-extern void get_clock();
+#ifndef sys_call_H
+#define sys_call_H
+#define SYS_CALL_NUM 10
+extern u_int32 sys_call_table[SYS_CALL_NUM];
 #endif

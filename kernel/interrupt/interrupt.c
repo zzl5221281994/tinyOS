@@ -31,7 +31,7 @@ SOFTWARE.
 #include "clock.h                                            "
 #define EXCEPTION_HANDERS_NUM 20
 #define INTERRUPT_HANDERS_NUM 16
-#define DEFAULT_ERRORCODE     12345678
+#define DEFAULT_ERRORCODE     8888
 //CPU exception
 PRIVATE void divide_exception               (void){
 	sys_exception_panic(DEFAULT_ERRORCODE,0);
@@ -108,7 +108,6 @@ PRIVATE void SIMD_exception                 (void){
 //EAX,ECX,EDX,EBX,ESP,EBP,ESI和EDI
 PUBLIC void IRQ0_clock1                     (void){
 	global_clock++;
-	drawNum(global_clock,0,0,0x3c,0x00);
 	sendEOI_Master();
 	schedule();
 }
@@ -118,6 +117,7 @@ PUBLIC void IRQ1_keyBoard1                  (void){
 	if(keyBoard_bufLen>MAX_KEYBOARD_BUF)
 		keyBoard_bufLen=0;
 	keyBoard_inPut_buf[keyBoard_bufLen]='\0';
+	drawStr(keyBoard_inPut_buf,200,0,0x3c,0x00);
 	sendEOI_Master ();
 }
 PUBLIC void IRQ2_slave1                     (void){
@@ -164,6 +164,9 @@ PUBLIC void IRQ13_FPU_error1                (void){
 	sendEOI_Master ();
 }
 PUBLIC void IRQ14_ATDisk1                   (void){
+	port_read(0x1F0,hdbuf,256);
+	hdbuf[512]='\0';
+	drawStr(hdbuf,0,0,0x3c,0x00);
 	sendEOI_Slave  ();
 	sendEOI_Master ();
 }

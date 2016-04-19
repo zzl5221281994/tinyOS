@@ -9,6 +9,8 @@
 #define STATUS_SUSPEND       1
 #define STATUS_EXEC          2
 #define STATUS_BLOCK         4
+
+#define INIT_EFLAGS          0x00001202
 struct stack_frame{
 	u_int32 gs        ;
 	u_int32 fs        ;
@@ -69,7 +71,8 @@ struct TSS{
 	u_int16	trap    ;
 	u_int16	iobase  ;//I/O位图基址大于或等于TSS段界限，就表示没有I/O许可位图 
 };
-extern u_int32 current_exec_pid;
+extern u_int32 current_exec_pid    ;
+extern u_int32 interrupt_mutex     ;
 extern void init_tss      (               );
 extern int32 createProcess(               );
 extern void schedule      (               );

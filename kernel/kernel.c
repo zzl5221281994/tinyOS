@@ -26,8 +26,10 @@ SOFTWARE.
 #include "bootInfo\bootInfo.h  "
 #include "kernelFun.h          "
 #include "interrupt\interrupt.h"
+#include "interrupt\clock.h    "
 #include "multiTask\process.h  "
 #include "IO\IO.h              "
+#include "hd.h                 "
 PUBLIC struct bootInfo boot_info;
 PUBLIC struct main_gdt       gdt;
 PUBLIC struct main_idt       idt;
@@ -36,6 +38,9 @@ PUBLIC u_int32 *vram32=NULL     ;
 PUBLIC u_int32 time=0           ;
 //static u_int8* tinyOS_str1="\nWed Mar 30 22 50 57 2016\n\nMIT License\nCopyright c 2016 zhuzuolang\n\nPermission is hereby granted free of charge to any person obtaining a copy\nof this software and associated documentation files the Software to deal\nin the Software without restriction including without limitation the rights\nto use copy modify merge publish distribute sublicense and or sell\ncopies of the Software and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software \nTHE SOFTWARE IS PROVIDED AS IS WITHOUT WARRANTY OF ANY KIND EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY WHETHER IN AN ACTION OF CONTRACT TORT OR OTHERWISE ARISING FROM \nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE\n\nWed Mar 30 22 50 57 2016\n\nMIT License\nCopyright c 2016 zhuzuolang\n\nPermission is hereby granted free of charge to any person obtaining a copy\nof this software and associated documentation files the Software to deal\nin the Software without restriction including without limitation the rights\nto use copy modify merge publish distribute sublicense and or sell\ncopies of the Software and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software \nTHE SOFTWARE IS PROVIDED AS IS WITHOUT WARRANTY OF ANY KIND EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY WHETHER IN AN ACTION OF CONTRACT TORT OR OTHERWISE ARISING FROM \nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE\n";
 void drawInfo();
+void testA();
+void testB();
+void testC();
 void HariMain(void)
 {
 	init_bootInfo();                  //启动信息
@@ -44,11 +49,26 @@ void HariMain(void)
 	init_gdt();
 	init_idt();
 	init_8259A();                   
-	init_pit(100);                    //设置每秒时钟中断次数
-	init_tss();
-	createProcess(3,1);
-	createProcess(2,1);
-	createProcess(1,1);	
+	init_pit(200);                    //设置每秒时钟中断次数
+	init_tss();	
+	
+	struct hd_cmd cmd;
+	cmd.device=MAKE_DEVICE_REG(0,0,0);
+	cmd.command=ATA_IDENTIFY;
+	while((io_in8(REG_STATUS)&STATUS_BSY)!=0);
+	
+	io_out8(REG_DEV_CTRL,0);
+	io_out8(REG_FEATURES,cmd.features);
+	io_out8(REG_NSECTOR,cmd.count);
+	io_out8(REG_LBA_LOW,cmd.lba_low);
+	io_out8(REG_LBA_MID,cmd.lba_mid);
+	io_out8(REG_LBA_HIGH,cmd.lba_high);
+	io_out8(REG_DEVICE,cmd.device);
+	io_out8(REG_CMD,cmd.command);
+	//createProcess(boot_info.codeBase+testB,1);
+	//createProcess(boot_info.codeBase+testC,1);
+	//createProcess(boot_info.codeBase+testA,1);
+	//createProcess(boot_info.codeBase+get_clock,1);
 	//drawInfo();
 	open_interrupt();
 	while(1)
