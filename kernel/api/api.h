@@ -1,5 +1,5 @@
 /************************************************************************************
-Tue Apr 19 10:29:59 2016
+Wed Apr 20 09:59:00 2016
 
 MIT License
 Copyright (c) 2016 zhuzuolang
@@ -19,16 +19,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-************************************************************************************/#ifndef IO_H
-#define IO_H
-#include "F:\work\tolset\tinyOS\kernel\lib\global.h             "
-#define MAX_KEYBOARD_BUF 100
-#define MAX_MOUSE_BUF    200
-extern int8 keyBoard_inPut_buf[];
-extern u_int32 keyBoard_bufLen  ;
+************************************************************************************/
+#ifndef api_H
+#define api_H
 
-extern u_int8 mouse_inPut_buf[] ;
-extern u_int32 mouse_bufLen     ;
-
-extern u_int32 hdbuf[]           ;
 #endif

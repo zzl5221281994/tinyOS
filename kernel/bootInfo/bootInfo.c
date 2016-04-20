@@ -27,6 +27,15 @@ SOFTWARE.
 #include "F:\work\tolset\tinyOS\kernel\interrupt\interrupt.h    "
 #include "F:\work\tolset\tinyOS\kernel\debug\debug.h            "
 #include "bootInfo.h                                            "
+#define KEYCMD_SENDTO_MOUSE		0xd4
+#define MOUSECMD_ENABLE			0xf4
+#define PORT_KEYDAT				0x0060
+#define PORT_KEYSTA				0x0064
+#define PORT_KEYCMD				0x0064
+#define KEYSTA_SEND_NOTREADY	0x02
+#define KEYCMD_WRITE_MODE		0x60
+#define KBC_MODE				0x47
+
 extern void   hander();
 PUBLIC int init_bootInfo(                                                                  ){
     u_int8*bp=(u_int8*)bootInfo_Pointer,*mp_ptr=(u_int8*)bootInfo_memMap;
@@ -81,10 +90,10 @@ PUBLIC int init_idt     (                                                       
 	u_int8 desc[8];
 	int i;
 	//int0~int19                   CPU异常
-	/*for(i=0;i<20;i++){
+	for(i=0;i<20;i++){
 		gen_gateDescriptor(desc,8,exception_hander[i],0,SegDesc_Property_386IGate);
 		memcpy8(desc,(u_int8*)(&(idt.idtDescriptor[i])),8);
-	}*/
+	}
 	//int20~int 0x1f               intel保留
 	for(i=20;i<0x20;i++){
 		gen_gateDescriptor(desc,8,hander,0,SegDesc_Property_386IGate);
@@ -152,9 +161,9 @@ PUBLIC int  init_8259A   (                                                      
 	io_out8(0xa1,0x01);
 	io_delay();
 	
-	load_master_maskWord(0xf9);
+	load_master_maskWord(0x00);
 	io_delay();
-	load_slave_maskWord(0xbd);
+	load_slave_maskWord(0x00);
 	io_delay();
 	return TRUE;
 }
@@ -164,5 +173,19 @@ PUBLIC void init_pit     (u_int32 timesPerSecond                                
 	io_out8(0x40,value&0x000000ff);
 	io_delay();
 	io_out8(0x40,((value&0x0000ff00)>>8));
+	return;
+}
+PUBLIC void init_mouse   (                                                                 ){
+	io_delay();
+	io_out8(PORT_KEYCMD, KEYCMD_SENDTO_MOUSE);
+	io_delay();
+	io_out8(PORT_KEYDAT, MOUSECMD_ENABLE);
+	return; 
+}
+PUBLIC void init_keyboard(                                                                 ){
+	io_delay();
+	io_out8(PORT_KEYCMD, KEYCMD_WRITE_MODE);
+	io_delay();
+	io_out8(PORT_KEYDAT, KBC_MODE);
 	return;
 }

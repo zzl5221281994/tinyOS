@@ -32,12 +32,12 @@
 		
 		EXTERN _IRQ0_clock1,_IRQ1_keyBoard1,_IRQ2_slave1,_IRQ3_port21,_IRQ4_port11,_IRQ5_LPT21,_IRQ6_floppyDisk1,_IRQ7_LPT11
 		EXTERN _IRQ8_CMOS1,_IRQ9_redirect_IRQ21,_IRQ10_reserved11,_IRQ11_reserved21,_IRQ12_PS2Mouse1,_IRQ13_FPU_error1,_IRQ14_ATDisk1,_IRQ15_reserved31
-        EXTERN _interrupt_mutex
+        EXTERN _kernel_mutex
 		EXTERN _process_table,_current_exec_pid
         EXTERN _sys_call_table
 [SECTION .text]
 _get_clock:
-		MOV		EAX,0
+		MOV		EAX,4
 		INT 	0X88
 		JMP		_get_clock
 _getErrorCode:
@@ -170,7 +170,5 @@ _IRQ15_reserved3:
 		
 ;系统调用	
 _sys_call:
-		MOV		EBX,4
-		MUL		EBX
 		CALL 	[_sys_call_table+EAX]
 		IRETD

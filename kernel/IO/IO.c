@@ -19,7 +19,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-************************************************************************************/#include "IO.h"
+************************************************************************************/
+#include "IO.h"
 int8 keyBoard_inPut_buf[MAX_KEYBOARD_BUF+1];
-int8 hdbuf[513];
-u_int32 keyBoard_bufLen=0;
+u_int8 mouse_inPut_buf[MAX_MOUSE_BUF+1]    ;
+u_int32 keyBoard_bufLen=0                  ;
+u_int32 mouse_bufLen=0                     ;
+
+u_int32 hdbuf[1024];

@@ -48,66 +48,41 @@ void HariMain(void)
 	vram32=(u_int32* )boot_info.vram;
 	init_gdt();
 	init_idt();
-	init_8259A();                   
-	init_pit(200);                    //设置每秒时钟中断次数
+	init_8259A(); 
+    init_keyboard();
+    init_mouse();	
+	init_pit(100);                    //设置每秒时钟中断次数
 	init_tss();	
 	
-	struct hd_cmd cmd;
-	cmd.device=MAKE_DEVICE_REG(0,0,0);
-	cmd.command=ATA_IDENTIFY;
-	while((io_in8(REG_STATUS)&STATUS_BSY)!=0);
 	
-	io_out8(REG_DEV_CTRL,0);
-	io_out8(REG_FEATURES,cmd.features);
-	io_out8(REG_NSECTOR,cmd.count);
-	io_out8(REG_LBA_LOW,cmd.lba_low);
-	io_out8(REG_LBA_MID,cmd.lba_mid);
-	io_out8(REG_LBA_HIGH,cmd.lba_high);
-	io_out8(REG_DEVICE,cmd.device);
-	io_out8(REG_CMD,cmd.command);
-	//createProcess(boot_info.codeBase+testB,1);
-	//createProcess(boot_info.codeBase+testC,1);
-	//createProcess(boot_info.codeBase+testA,1);
+	createProcess(boot_info.codeBase+testB,1);
 	//createProcess(boot_info.codeBase+get_clock,1);
 	//drawInfo();
 	open_interrupt();
 	while(1)
 		io_hlt();
 }
-void testA(){
-	int l=0;
-	while(1)
-	{
-		*(vram32+l)=0x2e2e2e2e;
-		//delay();
-		int i,j,key=0;
-	for(i=0;i<20;i++)
-		for(j=0;j<10000;j++)
-			   key+=i+j;
-		l++;
-	}
-}
 void testB(){
 	int l=0;
+	struct hd_cmd cmd;
+	cmd.device  = MAKE_DEVICE_REG(0, 0, 0);
+	cmd.command = ATA_IDENTIFY;
+	
+	io_out8(REG_DEV_CTRL, 0);
+	io_out8(REG_FEATURES, cmd.features);
+	io_out8(REG_NSECTOR,  cmd.count);
+	io_out8(REG_LBA_LOW,  cmd.lba_low);
+	io_out8(REG_LBA_MID,  cmd.lba_mid);
+	io_out8(REG_LBA_HIGH, cmd.lba_high);
+	io_out8(REG_DEVICE,   cmd.device);
+	io_out8(REG_CMD,     cmd.command);
+	
 	while(1)
 	{
-		*(vram32+1024*100+l)=0x1f1f1f1f;
+		*(vram8+l)=0x10;
 		//delay();
 		int i,j,key=0;
-	for(i=0;i<20;i++)
-		for(j=0;j<10000;j++)
-			   key+=i+j;
-		l++;
-	}
-}
-void testC(){
-	int l=0;
-	while(1)
-	{
-		*(vram32+1024*150+l)=0x3c3c3c3c;
-		//delay();
-		int i,j,key=0;
-	for(i=0;i<20;i++)
+	for(i=0;i<100;i++)
 		for(j=0;j<10000;j++)
 			   key+=i+j;
 		l++;

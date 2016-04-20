@@ -65,5 +65,26 @@ extern  int init_gdt     (                                                      
 extern  int init_idt     (                                                             );
 extern  int init_8259A   (                                                             );
 extern void init_pit     (u_int32 timesPerSecond                                       );
+extern void init_mouse   (                                                             );
 extern  int set_pattle   (                                                             );
+
+/*
+0x00:黑
+0x01:亮深蓝1
+0x02:翠绿
+0x03:灰绿
+0x04:深红
+0x05:深红紫
+0x06:暗黄
+0x07:白灰
+0x08:暗深蓝
+0x09:亮深蓝2
+0x0a:浅青绿
+0x0b:浅天蓝
+0x0c:紫红
+0x0d:亮紫
+0x0e:灰黄
+0x0f:白兰
+0x10:深翠绿
+*/
 #endif

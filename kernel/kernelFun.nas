@@ -41,19 +41,6 @@
 		EXTERN _clock_mutex
 [SECTION .text]
 _loadReg:
-		;MOV		EAX,[ESP+48]
-		;PUSH	EAX
-		;POPFD
-		;MOV		EAX,[ESP+20]
-		;MOV		ECX,[ESP+24]
-		;MOV		EDX,[ESP+28]
-		;MOV		EBX,[ESP+32]
-		;MOV		EBP,[ESP+36]
-		;MOV		ESI,[ESP+40]
-		;MOV		EDI,[ESP+44]
-		;ADD     ESP,4
-		;STI
-		;RETF
 		MOV		EAX,[ESP+24]
 		MOV		ECX,[ESP+28]
 		MOV		EDX,[ESP+32]
@@ -78,7 +65,7 @@ _close_interrupt:
 		POP		EAX
 		JMP		EAX
 _sendEOI_Master:
-		MOV		AL,0X20
+		MOV		AL,0x20
 		OUT		20H,AL
 		NOP
 		NOP
@@ -86,7 +73,7 @@ _sendEOI_Master:
 		NOP
 		RET
 _sendEOI_Slave:
-		MOV		AL,0X20
+		MOV		AL,0x20
 		OUT		0XA0,AL
 		NOP
 		NOP

@@ -27,6 +27,8 @@ SOFTWARE.
 extern u_int32 exception_hander[];
 //8259A 中断处理
 extern u_int32 interrupt_hander[];
+//全局锁,允许除了时钟中断外的所有中断和系统调用嵌套重入
+extern u_int32 kernel_mutex      ;
 extern u_int32 getErrorCode   (                    );
 //master
 extern void IRQ0_clock        (                    );

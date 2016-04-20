@@ -32,6 +32,8 @@ SOFTWARE.
 #define EXCEPTION_HANDERS_NUM 20
 #define INTERRUPT_HANDERS_NUM 16
 #define DEFAULT_ERRORCODE     8888
+//全局锁,允许除了时钟中断外的所有中断和系统调用嵌套重入
+PUBLIC u_int32 kernel_mutex=0;
 //CPU exception
 PRIVATE void divide_exception               (void){
 	sys_exception_panic(DEFAULT_ERRORCODE,0);
@@ -117,7 +119,7 @@ PUBLIC void IRQ1_keyBoard1                  (void){
 	if(keyBoard_bufLen>MAX_KEYBOARD_BUF)
 		keyBoard_bufLen=0;
 	keyBoard_inPut_buf[keyBoard_bufLen]='\0';
-	drawStr(keyBoard_inPut_buf,200,0,0x3c,0x00);
+    drawStr(keyBoard_inPut_buf,200,0,0x3c,0x00);
 	sendEOI_Master ();
 }
 PUBLIC void IRQ2_slave1                     (void){
@@ -156,6 +158,15 @@ PUBLIC void IRQ11_reserved21                (void){
 	sendEOI_Master ();
 }
 PUBLIC void IRQ12_PS2Mouse1                 (void){
+	u_int8 byte=io_in8(0x60);
+	mouse_inPut_buf[mouse_bufLen++]=byte;
+	if(mouse_bufLen>MAX_MOUSE_BUF)
+		mouse_bufLen=0;
+	mouse_inPut_buf[mouse_bufLen]='\0';
+	drawNum(mouse_bufLen,0,1024-100,0x3c,0x00);
+	int i;
+	for(i=0;i<mouse_bufLen;i++)
+		drawNum(mouse_inPut_buf[i],300+16*((i*30)/1024),(i*30)%1024,0x3c,0x00);
 	sendEOI_Slave  ();
 	sendEOI_Master ();
 }
@@ -164,9 +175,16 @@ PUBLIC void IRQ13_FPU_error1                (void){
 	sendEOI_Master ();
 }
 PUBLIC void IRQ14_ATDisk1                   (void){
-	port_read(0x1F0,hdbuf,256);
-	hdbuf[512]='\0';
-	drawStr(hdbuf,0,0,0x3c,0x00);
+	//port_read(0x1F0, hdbuf, 256);
+	int i,j;
+	for(i=0;i<256;i++)
+		hdbuf[i]=0;
+	for(i=0;i<256;i++)
+		hdbuf[i]=io_in16(0x1f0);
+	for(i=0;i<16;i++)
+		for(j=0;j<16;j++)
+			drawNum(hdbuf[i*16+j],400+i*16,j*56,0x3c,0x00);
+	drawStr("ata",384,0,0x3c,0x00);
 	sendEOI_Slave  ();
 	sendEOI_Master ();
 }
