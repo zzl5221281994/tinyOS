@@ -147,12 +147,14 @@ _io_out32:	                    ; void io_out32(int port, int data);
 ;                  void port_read(u16 port, void* buf, int n);
 ; ========================================================================
 _port_read:
+		PUSHAD
 	    MOV	EDX, [ESP + 4]	; port
 		MOV	EDI, [ESP + 8]	; buf
 		MOV	ECX, [ESP + 12]	; n
 		SHR ECX, 1
 		CLD
 		REP INSW
+		POPAD
 		RET
 
 ; ========================================================================

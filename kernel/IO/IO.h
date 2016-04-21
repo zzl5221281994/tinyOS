@@ -30,5 +30,5 @@ extern u_int32 keyBoard_bufLen  ;
 extern u_int8 mouse_inPut_buf[] ;
 extern u_int32 mouse_bufLen     ;
 
-extern u_int32 hdbuf[]           ;
+extern u_int16 hdbuf[]           ;
 #endif

@@ -27,6 +27,7 @@ SOFTWARE.
 #include "F:\work\tolset\tinyOS\kernel\graphics\font.h       "
 #include "F:\work\tolset\tinyOS\kernel\IO\IO.h               "
 #include "F:\work\tolset\tinyOS\kernel\multiTask\process.h   "
+#include "F:\work\tolset\tinyOS\kernel\hd.h                  "
 #include "interrupt.h                                        "
 #include "clock.h                                            "
 #define EXCEPTION_HANDERS_NUM 20
@@ -174,17 +175,9 @@ PUBLIC void IRQ13_FPU_error1                (void){
 	sendEOI_Slave  ();
 	sendEOI_Master ();
 }
+extern u_int16 buf[];
 PUBLIC void IRQ14_ATDisk1                   (void){
-	//port_read(0x1F0, hdbuf, 256);
-	int i,j;
-	for(i=0;i<256;i++)
-		hdbuf[i]=0;
-	for(i=0;i<256;i++)
-		hdbuf[i]=io_in16(0x1f0);
-	for(i=0;i<16;i++)
-		for(j=0;j<16;j++)
-			drawNum(hdbuf[i*16+j],400+i*16,j*56,0x3c,0x00);
-	drawStr("ata",384,0,0x3c,0x00);
+	drawStr("ata",184,0,0x3c,0x00);
 	sendEOI_Slave  ();
 	sendEOI_Master ();
 }

@@ -54,35 +54,20 @@ void HariMain(void)
 	init_pit(100);                    //设置每秒时钟中断次数
 	init_tss();	
 	
-	
 	createProcess(boot_info.codeBase+testB,1);
-	//createProcess(boot_info.codeBase+get_clock,1);
+	createProcess(boot_info.codeBase+get_clock,1);
 	//drawInfo();
 	open_interrupt();
 	while(1)
 		io_hlt();
 }
 void testB(){
-	int l=0;
-	struct hd_cmd cmd;
-	cmd.device  = MAKE_DEVICE_REG(0, 0, 0);
-	cmd.command = ATA_IDENTIFY;
-	
-	io_out8(REG_DEV_CTRL, 0);
-	io_out8(REG_FEATURES, cmd.features);
-	io_out8(REG_NSECTOR,  cmd.count);
-	io_out8(REG_LBA_LOW,  cmd.lba_low);
-	io_out8(REG_LBA_MID,  cmd.lba_mid);
-	io_out8(REG_LBA_HIGH, cmd.lba_high);
-	io_out8(REG_DEVICE,   cmd.device);
-	io_out8(REG_CMD,     cmd.command);
-	
+	u_int32 l=0;
 	while(1)
 	{
-		*(vram8+l)=0x10;
-		//delay();
+		*(vram8+l)=0x3c;
 		int i,j,key=0;
-	for(i=0;i<100;i++)
+	for(i=0;i<10;i++)
 		for(j=0;j<10000;j++)
 			   key+=i+j;
 		l++;
@@ -119,3 +104,53 @@ void drawInfo(){
 //drawStr("~!@#$%^&*()_+}{|\":?><",200,0,0x1f,0x00);
 	return ;
 }
+/*
+_IRQ0_clock:
+		PUSHAD
+		;得到进程表stackFrame的偏移
+		MOV		EAX,136
+		MUL     DWORD[_current_exec_pid]
+		ADD 	EAX,_process_table
+		ADD		EAX,16
+		;保存现场信息
+		MOV		EBX,[ESP+48]
+		MOV		[EAX],EBX
+		
+		MOV		EBX,[ESP+44]
+		MOV		[EAX+4],EBX
+		
+		MOV		EBX,[ESP+40]
+		MOV		[EAX+8],EBX
+		
+		MOV		EBX,[ESP+36]
+		MOV		[EAX+12],EBX
+		
+		MOV		EBX,[ESP+32]
+		MOV		[EAX+16],EBX
+		
+		MOV		EBX,[ESP+28]
+		MOV		[EAX+20],EBX
+		
+		MOV		EBX,[ESP+24]
+		MOV		[EAX+24],EBX
+		
+		MOV		EBX,[ESP+20]
+		MOV		[EAX+28],EBX
+		
+		MOV		EBX,[ESP+16]
+		MOV		[EAX+32],EBX
+		
+		MOV		EBX,[ESP+12]
+		MOV		[EAX+36],EBX
+		
+		MOV		EBX,[ESP+8]
+		MOV		[EAX+40],EBX
+		
+		MOV		EBX,[ESP+4]
+		MOV		[EAX+44],EBX
+	
+		MOV		EBX,[ESP]
+		MOV		[EAX+48],EBX
+		
+		CALL _IRQ0_clock1
+		*/

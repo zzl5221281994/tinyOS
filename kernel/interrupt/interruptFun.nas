@@ -32,12 +32,16 @@
 		
 		EXTERN _IRQ0_clock1,_IRQ1_keyBoard1,_IRQ2_slave1,_IRQ3_port21,_IRQ4_port11,_IRQ5_LPT21,_IRQ6_floppyDisk1,_IRQ7_LPT11
 		EXTERN _IRQ8_CMOS1,_IRQ9_redirect_IRQ21,_IRQ10_reserved11,_IRQ11_reserved21,_IRQ12_PS2Mouse1,_IRQ13_FPU_error1,_IRQ14_ATDisk1,_IRQ15_reserved31
-        EXTERN _kernel_mutex
+        ;EXTERN _kernel_mutex
 		EXTERN _process_table,_current_exec_pid
         EXTERN _sys_call_table
+		
+		;EXTERN _global_clock
+		;EXTERN _drawNum
+		;EXTERN _test_num
 [SECTION .text]
 _get_clock:
-		MOV		EAX,4
+		MOV		EAX,0
 		INT 	0X88
 		JMP		_get_clock
 _getErrorCode:
@@ -45,6 +49,7 @@ _getErrorCode:
 		RET
 _IRQ0_clock:
 		PUSHAD
+		
 		;得到进程表stackFrame的偏移
 		MOV		EAX,136
 		MUL     DWORD[_current_exec_pid]
@@ -89,8 +94,16 @@ _IRQ0_clock:
 	
 		MOV		EBX,[ESP]
 		MOV		[EAX+48],EBX
-		
 		CALL _IRQ0_clock1
+	L1:
+		;PUSH    000h
+		;PUSH	03Ch
+		;PUSH	400
+		;PUSH	0
+		;PUSH	[_kernel_mutex]
+		;CALL	_drawNum
+		;ADD		ESP,20
+		IRETD
 _IRQ1_keyBoard:
 		PUSHAD
 		CALL _IRQ1_keyBoard1
@@ -170,5 +183,10 @@ _IRQ15_reserved3:
 		
 ;系统调用	
 _sys_call:
+		;INC 	DWORD[_kernel_mutex]
+		;STI
 		CALL 	[_sys_call_table+EAX]
+		;CLI
+		;DEC 	DWORD[_kernel_mutex]
+		;OR		DWORD[ESP+8],00000200H
 		IRETD

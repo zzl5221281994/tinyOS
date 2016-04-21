@@ -5,7 +5,6 @@
 PUBLIC struct proc_table process_table[MAX_PROCESS];
 PUBLIC struct TSS global_tss                       ;
 PUBLIC u_int32 current_exec_pid=0                  ;
-PUBLIC u_int32 interrupt_mutex=0                   ;
 PUBLIC u_int32 process_table_len=1                 ;
 PRIVATE u_int32 base    =0x1000000                 ;
 PRIVATE u_int32 allo_len=0xFFFF                    ;
@@ -42,7 +41,6 @@ PUBLIC void schedule(){
 	u_int32 eflags=process_table[current_exec_pid].frame.eflags;
 	u_int32 esp=process_table[current_exec_pid].frame.esp      ;
 	u_int32 ss=process_table[current_exec_pid].frame.ss        ;
-	//loadReg(eip,cs,esp,ss,eax,ecx,edx,ebx,ebp,esi,edi,eflags&0xfffffdff);//eflags & 0xfffffdff ,关中断
 	loadReg(eip,cs,eflags,esp,ss,eax,ecx,edx,ebx,ebp,esi,edi);
 }
 PUBLIC int32 createProcess(u_int32 offset,u_int32 max_time){

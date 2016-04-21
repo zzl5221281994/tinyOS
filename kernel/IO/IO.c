@@ -26,4 +26,4 @@ u_int8 mouse_inPut_buf[MAX_MOUSE_BUF+1]    ;
 u_int32 keyBoard_bufLen=0                  ;
 u_int32 mouse_bufLen=0                     ;
 
-u_int32 hdbuf[1024];
+u_int16 hdbuf[512];
