@@ -27,7 +27,7 @@ SOFTWARE.
 #include "F:\work\tolset\tinyOS\kernel\graphics\font.h       "
 #include "F:\work\tolset\tinyOS\kernel\IO\IO.h               "
 #include "F:\work\tolset\tinyOS\kernel\multiTask\process.h   "
-#include "F:\work\tolset\tinyOS\kernel\hd.h                  "
+#include "F:\work\tolset\tinyOS\kernel\drivers\hd.h          "
 #include "interrupt.h                                        "
 #include "clock.h                                            "
 #define EXCEPTION_HANDERS_NUM 20
@@ -116,12 +116,12 @@ PUBLIC void IRQ0_clock1                     (void){
 }
 PUBLIC void IRQ1_keyBoard1                  (void){
 	u_int8 byte=io_in8(0x60);
+	sendEOI_Master ();
 	keyBoard_inPut_buf[keyBoard_bufLen++]=byte;
 	if(keyBoard_bufLen>MAX_KEYBOARD_BUF)
 		keyBoard_bufLen=0;
 	keyBoard_inPut_buf[keyBoard_bufLen]='\0';
     drawStr(keyBoard_inPut_buf,200,0,0x3c,0x00);
-	sendEOI_Master ();
 }
 PUBLIC void IRQ2_slave1                     (void){
 	sendEOI_Master ();
@@ -160,6 +160,8 @@ PUBLIC void IRQ11_reserved21                (void){
 }
 PUBLIC void IRQ12_PS2Mouse1                 (void){
 	u_int8 byte=io_in8(0x60);
+	sendEOI_Slave  ();
+	sendEOI_Master ();
 	mouse_inPut_buf[mouse_bufLen++]=byte;
 	if(mouse_bufLen>MAX_MOUSE_BUF)
 		mouse_bufLen=0;
@@ -168,8 +170,6 @@ PUBLIC void IRQ12_PS2Mouse1                 (void){
 	int i;
 	for(i=0;i<mouse_bufLen;i++)
 		drawNum(mouse_inPut_buf[i],300+16*((i*30)/1024),(i*30)%1024,0x3c,0x00);
-	sendEOI_Slave  ();
-	sendEOI_Master ();
 }
 PUBLIC void IRQ13_FPU_error1                (void){
 	sendEOI_Slave  ();
@@ -177,9 +177,9 @@ PUBLIC void IRQ13_FPU_error1                (void){
 }
 extern u_int16 buf[];
 PUBLIC void IRQ14_ATDisk1                   (void){
-	drawStr("ata",184,0,0x3c,0x00);
 	sendEOI_Slave  ();
 	sendEOI_Master ();
+	drawStr("ata",184,0,0x3c,0x00);
 }
 PUBLIC void IRQ15_reserved31                (void){
 	sendEOI_Slave  ();

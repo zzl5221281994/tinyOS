@@ -63,10 +63,10 @@ PUBLIC void sys_panic(                                            ){
 PUBLIC void sys_exception_panic(u_int32 errorCode,u_int32 vectorNo){
 	u_int32 i,j,color=0x00000000;
 	u_int32 height=boot_info.screen_height     ;
-	u_int32 width =(boot_info.screen_width>>2) ; //用vram32清屏较快 一次4字节
+	u_int32 width =boot_info.screen_width      ; //用vram32清屏较快 一次4字节
 	//清屏
-    for(i=0;i<768;i++)
-		for(j=0;j<1024;j++)
+    for(i=0;i<height;i++)
+		for(j=0;j<width;j++)
 			*(vram8+(i*1024)+j)=0x2e;
 	color=0x3c;
 	drawStr("vectorNo" ,0,0  ,0x3c,0x00 );
@@ -78,5 +78,19 @@ PUBLIC void sys_exception_panic(u_int32 errorCode,u_int32 vectorNo){
 	drawStr(exception_msg[vectorNo].sign,16,200,0x1f,0x00     );
 	drawNum(errorCode,16,300,0x1f,0x00                        );
 	drawStr(exception_msg[vectorNo].describe,32,300,0x1f,0x00 );
+	sys_panic();
+}
+PUBLIC void assertion_failure(char *exp, char *file, char *base_file, int line){
+	u_int32 i,j,color=0x00000000;
+	u_int32 height=boot_info.screen_height     ;
+	u_int32 width =boot_info.screen_width      ; //用vram32清屏较快 一次4字节
+	//清屏
+    for(i=0;i<height;i++)
+		for(j=0;j<width;j++)
+			*(vram8+(i*1024)+j)=0x2e;
+	drawStr(exp,0,0,0x3c,0x00);
+	drawStr(file,16,0,0x3c,0x00);
+	drawStr(base_file,32,0,0x3c,0x00);
+	drawNum(line,48,0,0x3c,0x00);
 	sys_panic();
 }

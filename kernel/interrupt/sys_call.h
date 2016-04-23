@@ -22,6 +22,10 @@ SOFTWARE.
 ************************************************************************************/
 #ifndef sys_call_H
 #define sys_call_H
-#define SYS_CALL_NUM 10
-extern u_int32 sys_call_table[SYS_CALL_NUM];
+#include "F:\work\tolset\tinyOS\kernel\graphics\font.h          "
+#include "F:\work\tolset\tinyOS\kernel\multiTask\process.h      "
+#include "F:\work\tolset\tinyOS\kernel\debug\debug.h            "
+extern u_int32 msg_queue_table[MAX_PROCESS];
+extern u_int32 send_msg(struct MESSAGE*msg,u_int32 send_pid);
+extern u_int32 recv_msg(struct MESSAGE*msg,u_int32 recv_pid);
 #endif

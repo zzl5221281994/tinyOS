@@ -37,8 +37,8 @@ extern void    port_read             (u_int16 port, void* buf, int32 n         )
 extern void    port_write            (u_int16 port, void* buf, int32 n         );
 extern void    load_master_maskWord  (u_int8 word                              );
 extern void    load_slave_maskWord   (u_int8 word                              );
-//extern void    sendEOI_Master        (                                         );
-//extern void    sendEOI_Slave         (                                         );
+extern void    sendEOI_Master        (                                         );
+extern void    sendEOI_Slave         (                                         );
 extern void    open_interrupt        (                                         );
 extern void    close_interrupt       (                                         );
 extern void    loadTss               (                                         );

@@ -47,18 +47,22 @@ PUBLIC int32 createProcess(u_int32 offset,u_int32 max_time){
 	u_int8 desc[8];
 	process_table[process_table_len].max_time=max_time;
 	process_table[process_table_len].current_time=max_time;
-	//代码
+	//LDT代码段
 	gen_normalDescriptor(desc,base,allo_len,SegDesc_Property_EXEC_R|SegDesc_Property_32|SegDesc_Property_DPL1);
 	memcpy8(desc,process_table[process_table_len].ldtDescriptor[0],8);
 	memcpy8((u_int8*)offset,(u_int8*)base,0xffff);
+	process_table[process_table_len].codeBase=base;
 	base+=allo_len+1;
-	//数据
+	//LDT数据段
 	gen_normalDescriptor(desc,base,allo_len,SegDesc_Property_RW|SegDesc_Property_32|SegDesc_Property_DPL1);
 	memcpy8(desc,process_table[process_table_len].ldtDescriptor[1],8);
+	process_table[process_table_len].dataBase=base;
 	base+=allo_len+1;
-	//堆栈
+	
+	//LDT堆栈段
 	gen_normalDescriptor(desc,base,allo_len,SegDesc_Property_RW|SegDesc_Property_32|SegDesc_Property_DPL1);
 	memcpy8(desc,process_table[process_table_len].ldtDescriptor[2],8);
+	process_table[process_table_len].stackBase=base;
 	base+=allo_len+1;
 	
 	

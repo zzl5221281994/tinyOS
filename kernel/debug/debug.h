@@ -23,6 +23,8 @@ SOFTWARE.
 #ifndef debug_H
 #define debug_H
 #include "F:\work\tolset\tinyOS\kernel\lib\global.h   "
-extern void sys_exception_panic(u_int32 errorCode,u_int32 vectorNo);
-extern void sys_panic          (                                  );
+extern void assertion_failure(char *exp, char *file, char *base_file, int line);
+#define assert(exp)  if (exp);else assertion_failure(#exp, __FILE__, __BASE_FILE__, __LINE__)
+extern void sys_exception_panic(u_int32 errorCode,u_int32 vectorNo            );
+extern void sys_panic          (                                              );
 #endif

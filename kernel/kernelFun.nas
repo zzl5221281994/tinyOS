@@ -38,7 +38,7 @@
 		GLOBAL  _hander,_sendEOI_Master,_sendEOI_Slave
 		GLOBAL  _open_interrupt,_close_interrupt
 		
-		EXTERN _clock_mutex
+		EXTERN _kernel_mutex
 [SECTION .text]
 _loadReg:
 		MOV		EAX,[ESP+24]
@@ -49,6 +49,7 @@ _loadReg:
 		MOV		ESI,[ESP+44]
 		MOV		EDI,[ESP+48]
 		ADD		ESP,4
+		DEC		DWORD[_kernel_mutex]
 		IRETD
 _loadTss:
 		LTR [ESP+4]

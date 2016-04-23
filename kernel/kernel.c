@@ -29,7 +29,8 @@ SOFTWARE.
 #include "interrupt\clock.h    "
 #include "multiTask\process.h  "
 #include "IO\IO.h              "
-#include "hd.h                 "
+#include "drivers\hd.h         "
+#include "debug\debug.h        "
 PUBLIC struct bootInfo boot_info;
 PUBLIC struct main_gdt       gdt;
 PUBLIC struct main_idt       idt;
@@ -55,8 +56,6 @@ void HariMain(void)
 	init_tss();	
 	
 	createProcess(boot_info.codeBase+testB,1);
-	createProcess(boot_info.codeBase+get_clock,1);
-	//drawInfo();
 	open_interrupt();
 	while(1)
 		io_hlt();
@@ -67,7 +66,7 @@ void testB(){
 	{
 		*(vram8+l)=0x3c;
 		int i,j,key=0;
-	for(i=0;i<10;i++)
+	//for(i=0;i<10;i++)
 		for(j=0;j<10000;j++)
 			   key+=i+j;
 		l++;

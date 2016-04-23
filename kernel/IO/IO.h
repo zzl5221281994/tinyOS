@@ -19,16 +19,19 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-************************************************************************************/#ifndef IO_H
+************************************************************************************/
+#ifndef IO_H
 #define IO_H
 #include "F:\work\tolset\tinyOS\kernel\lib\global.h             "
 #define MAX_KEYBOARD_BUF 100
 #define MAX_MOUSE_BUF    200
+#define MAX_HD_MSG        20
+//键盘数据缓冲区
 extern int8 keyBoard_inPut_buf[];
 extern u_int32 keyBoard_bufLen  ;
-
+//鼠标数据缓冲区
 extern u_int8 mouse_inPut_buf[] ;
 extern u_int32 mouse_bufLen     ;
 
-extern u_int16 hdbuf[]           ;
+
 #endif
