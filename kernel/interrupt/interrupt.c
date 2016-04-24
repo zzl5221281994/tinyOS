@@ -121,7 +121,7 @@ PUBLIC void IRQ1_keyBoard1                  (void){
 	if(keyBoard_bufLen>MAX_KEYBOARD_BUF)
 		keyBoard_bufLen=0;
 	keyBoard_inPut_buf[keyBoard_bufLen]='\0';
-    drawStr(keyBoard_inPut_buf,200,0,0x3c,0x00);
+    //drawStr(keyBoard_inPut_buf,200,0,0x3c,0x00);
 }
 PUBLIC void IRQ2_slave1                     (void){
 	sendEOI_Master ();
@@ -166,10 +166,10 @@ PUBLIC void IRQ12_PS2Mouse1                 (void){
 	if(mouse_bufLen>MAX_MOUSE_BUF)
 		mouse_bufLen=0;
 	mouse_inPut_buf[mouse_bufLen]='\0';
-	drawNum(mouse_bufLen,0,1024-100,0x3c,0x00);
-	int i;
-	for(i=0;i<mouse_bufLen;i++)
-		drawNum(mouse_inPut_buf[i],300+16*((i*30)/1024),(i*30)%1024,0x3c,0x00);
+	//drawNum(mouse_bufLen,0,1024-100,0x3c,0x00);
+	//int i;
+	//for(i=0;i<mouse_bufLen;i++)
+	//	drawNum(mouse_inPut_buf[i],300+16*((i*30)/1024),(i*30)%1024,0x3c,0x00);
 }
 PUBLIC void IRQ13_FPU_error1                (void){
 	sendEOI_Slave  ();

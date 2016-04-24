@@ -110,7 +110,7 @@ PUBLIC int init_idt     (                                                       
 		memcpy8(desc,(u_int8*)(&(idt.idtDescriptor[i])),8);
 	}
 	//int 0x88                     系统调用
-	gen_gateDescriptor(desc,8,hander,0,SegDesc_Property_386IGate|SegDesc_Property_DPL3);
+	gen_gateDescriptor(desc,8,sys_call,0,SegDesc_Property_386IGate|SegDesc_Property_DPL3);
 	memcpy8(desc,(u_int8*)(&(idt.idtDescriptor[0x88])),8);
 	
 	//int 0x89~ int 255            默认

@@ -41,6 +41,9 @@
 		EXTERN _kernel_mutex
 [SECTION .text]
 _loadReg:
+		MOV		EAX,[ESP+52];DS
+		MOV		DS,AX
+		
 		MOV		EAX,[ESP+24]
 		MOV		ECX,[ESP+28]
 		MOV		EDX,[ESP+32]

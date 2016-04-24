@@ -25,7 +25,6 @@
 [BITS 32]						;
 [FILE "interrupt.nas"]			;
 		GLOBAL _getErrorCode
-		GLOBAL _get_clock
 		GLOBAL _IRQ0_clock,_IRQ1_keyBoard,_IRQ2_slave,_IRQ3_port2,_IRQ4_port1,_IRQ5_LPT2,_IRQ6_floppyDisk,_IRQ7_LPT1
 		GLOBAL _IRQ8_CMOS ,_IRQ9_redirect_IRQ2,_IRQ10_reserved1,_IRQ11_reserved2,_IRQ12_PS2Mouse,_IRQ13_FPU_error,_IRQ14_ATDisk,_IRQ15_reserved3
         GLOBAL _sys_call
@@ -35,57 +34,86 @@
 		EXTERN _IRQ8_CMOS1,_IRQ9_redirect_IRQ21,_IRQ10_reserved11,_IRQ11_reserved21,_IRQ12_PS2Mouse1,_IRQ13_FPU_error1,_IRQ14_ATDisk1,_IRQ15_reserved31
         EXTERN _kernel_mutex
 		EXTERN _process_table,_current_exec_pid
-		
+		EXTERN _sys_call_table
 		EXTERN _global_clock
 		EXTERN  _sendEOI_Master
 [SECTION .text]
 _getErrorCode:
 		MOV		EAX,[ESP+4]
 		RET
+_sys_call:;该调用通过INT指令访问系统调用，由于系统调用里面可能会导致进程阻塞，因此需要保存上下文。
+          ;ebx,ecx,edx,esi,分别保存则4个参数，eax保存着调用号
+		PUSHAD
+		CALL	_save_context
+		PUSH	ESI
+		PUSH	EDX
+		PUSH	ECX
+		PUSH	EBX
+		CALL 	[_sys_call_table+EAX]
+		ADD 	ESP,16
+		;由于EAX带着返回值，因此不能直接POPAD
+		PUSH	EAX
+		ADD		ESP,4
+		POPAD
+		MOV		EAX,[ESP-32];取出压入栈中的返回参数
+		IRETD
 _save_context:
-		MOV		EAX,176
+;使用规则
+;ss
+;esp
+;eflags
+;cs
+;eip
+;pushad
+;call _save_context
+		PUSH    EAX
+		PUSH	EBX
+		MOV		EAX,164
 		MUL     DWORD[_current_exec_pid]
 		ADD 	EAX,_process_table
 		ADD		EAX,16
 		;保存现场信息
-		MOV		EBX,[ESP+52]
+		MOV		EBX,[ESP+60]
 		MOV		[EAX],EBX
 		
-		MOV		EBX,[ESP+48]
+		MOV		EBX,[ESP+56]
 		MOV		[EAX+4],EBX
 		
-		MOV		EBX,[ESP+44]
+		MOV		EBX,[ESP+52]
 		MOV		[EAX+8],EBX
 		
-		MOV		EBX,[ESP+40]
+		MOV		EBX,[ESP+48]
 		MOV		[EAX+12],EBX
 		
-		MOV		EBX,[ESP+36]
+		MOV		EBX,[ESP+44]
 		MOV		[EAX+16],EBX
 		
-		MOV		EBX,[ESP+32]
+		MOV		EBX,[ESP+40]
 		MOV		[EAX+20],EBX
 		
-		MOV		EBX,[ESP+28]
+		MOV		EBX,[ESP+36]
 		MOV		[EAX+24],EBX
 		
-		MOV		EBX,[ESP+24]
+		MOV		EBX,[ESP+32]
 		MOV		[EAX+28],EBX
 		
-		MOV		EBX,[ESP+20]
+		MOV		EBX,[ESP+28]
 		MOV		[EAX+32],EBX
 		
-		MOV		EBX,[ESP+16]
+		MOV		EBX,[ESP+24]
 		MOV		[EAX+36],EBX
 		
-		MOV		EBX,[ESP+12]
+		MOV		EBX,[ESP+20]
 		MOV		[EAX+40],EBX
 		
-		MOV		EBX,[ESP+8]
+		MOV		EBX,[ESP+16]
 		MOV		[EAX+44],EBX
 	
-		MOV		EBX,[ESP+4]
+		MOV		EBX,[ESP+12]
 		MOV		[EAX+48],EBX
+		
+		POP		EBX
+		POP		EAX
 		RET
 _IRQ0_clock:
 		CMP		DWORD[_kernel_mutex],0

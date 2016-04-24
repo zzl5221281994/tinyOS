@@ -25,7 +25,14 @@ SOFTWARE.
 #include "F:\work\tolset\tinyOS\kernel\graphics\font.h          "
 #include "F:\work\tolset\tinyOS\kernel\multiTask\process.h      "
 #include "F:\work\tolset\tinyOS\kernel\debug\debug.h            "
+#define SYS_CALL_NUM    2
+extern u_int32 sys_call_table[SYS_CALL_NUM];
 extern u_int32 msg_queue_table[MAX_PROCESS];
-extern u_int32 send_msg(struct MESSAGE*msg,u_int32 send_pid);
-extern u_int32 recv_msg(struct MESSAGE*msg,u_int32 recv_pid);
+extern void sys_call            (                                                                );
+extern void init_msg_queue      (                                                                );
+extern void init_sys_call_table (                                                                );
+extern u_int32 l_addr2liner_addr(u_int32 addr,u_int32 pid,u_int32 type                           );
+
+extern u_int32 send_msg         (struct MESSAGE*msg, u_int32 call_pid                            );
+extern u_int32 recv_msg         (struct MESSAGE*msg,u_int32 type,u_int32 specify,u_int32 call_pid);
 #endif

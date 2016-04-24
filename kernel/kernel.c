@@ -31,6 +31,7 @@ SOFTWARE.
 #include "IO\IO.h              "
 #include "drivers\hd.h         "
 #include "debug\debug.h        "
+#include "interrupt\sys_call.h "
 PUBLIC struct bootInfo boot_info;
 PUBLIC struct main_gdt       gdt;
 PUBLIC struct main_idt       idt;
@@ -42,6 +43,47 @@ void drawInfo();
 void testA();
 void testB();
 void testC();
+/*************************************************************************************/
+PRIVATE void init_hd           (                               ){
+	u_int8 *ptr=0x475;//此处保存着机器上硬盘的数量
+	assert((*ptr)!=0);//确认机器存在硬盘
+	/*消息缓冲区全部无效*/
+}
+PRIVATE void hd_cmd_out        (struct hd_cmd* cmd          ){
+
+	/* Activate the Interrupt Enable (nIEN) bit */
+	io_out8(REG_DEV_CTRL, 0);
+	/* Load required parameters in the Command Block Registers */
+	io_out8(REG_FEATURES, cmd->features);
+	io_out8(REG_NSECTOR,  cmd->count);
+	io_out8(REG_LBA_LOW,  cmd->lba_low);
+	io_out8(REG_LBA_MID,  cmd->lba_mid);
+	io_out8(REG_LBA_HIGH, cmd->lba_high);
+	io_out8(REG_DEVICE,   cmd->device);
+	while((io_in8(REG_STATUS)&STATUS_DRDY)==0);
+	/* Write the command code to the Command Register */
+	io_out8(REG_CMD,     cmd->command);
+}
+PRIVATE u_int32 hd_sector_read (u_int32 lba,u_int16*liner_buf,u_int32 pos){
+	struct hd_cmd cmd;
+	cmd.features=0;
+	cmd.device  =MAKE_DEVICE_REG(LBA_MODE,0/*主硬盘0号控制器*/,/*lba高4位*/(lba&0xf000000)>>24);
+	cmd.command =ATA_READ;
+	cmd.count   =1;/*只允许读取一个扇区*/
+	cmd.lba_low =lba&0xff;
+	cmd.lba_mid =((lba&0xff00)>>8);
+	cmd.lba_high=((lba&0xff0000)>>16);
+	hd_cmd_out(&cmd);
+	while(io_in8(REG_STATUS)&STATUS_DRQ==0);
+	int i;
+	for(i=0;i<256;i++)
+		liner_buf[i]=io_in16(REG_DATA);
+}
+
+/*************************************************************************************/
+u_int16 buf[256];
+u_int16 buf1[256];
+/*内核入口*/
 void HariMain(void)
 {
 	init_bootInfo();                  //启动信息
@@ -54,8 +96,20 @@ void HariMain(void)
     init_mouse();	
 	init_pit(100);                    //设置每秒时钟中断次数
 	init_tss();	
+	init_msg_queue();
+	init_sys_call_table();
+	init_hd();
+	hd_sector_read(0,buf,0);
+	hd_sector_read(1,buf1,0);
+	u_int32 pid1=createServer(boot_info.codeBase+testA,1);
+	//pid1=createServer(boot_info.codeBase+testB,1);
+	u_int32 pid2=createProcess((u_int8*)buf,512,1,1);
+	u_int32 pid3=createProcess((u_int8*)buf1,512,1,1);
 	
-	createProcess(boot_info.codeBase+testB,1);
+	//drawInfo();
+	//drawNum(pid1,0,0,0x3c,0x00);
+	//drawNum(pid2,0,100,0x3c,0x00);
+	//drawNum(pid3,0,200,0x3c,0x00);
 	open_interrupt();
 	while(1)
 		io_hlt();
@@ -67,6 +121,18 @@ void testB(){
 		*(vram8+l)=0x3c;
 		int i,j,key=0;
 	//for(i=0;i<10;i++)
+		for(j=0;j<10000;j++)
+			   key+=i+j;
+		l++;
+	}
+}
+void testA(){
+	u_int32 l=0;
+	while(1)
+	{
+		*(vram8+l+1024*500)=0x1f;
+		int i,j,key=0;
+	for(i=0;i<10;i++)
 		for(j=0;j<10000;j++)
 			   key+=i+j;
 		l++;
@@ -103,53 +169,3 @@ void drawInfo(){
 //drawStr("~!@#$%^&*()_+}{|\":?><",200,0,0x1f,0x00);
 	return ;
 }
-/*
-_IRQ0_clock:
-		PUSHAD
-		;得到进程表stackFrame的偏移
-		MOV		EAX,136
-		MUL     DWORD[_current_exec_pid]
-		ADD 	EAX,_process_table
-		ADD		EAX,16
-		;保存现场信息
-		MOV		EBX,[ESP+48]
-		MOV		[EAX],EBX
-		
-		MOV		EBX,[ESP+44]
-		MOV		[EAX+4],EBX
-		
-		MOV		EBX,[ESP+40]
-		MOV		[EAX+8],EBX
-		
-		MOV		EBX,[ESP+36]
-		MOV		[EAX+12],EBX
-		
-		MOV		EBX,[ESP+32]
-		MOV		[EAX+16],EBX
-		
-		MOV		EBX,[ESP+28]
-		MOV		[EAX+20],EBX
-		
-		MOV		EBX,[ESP+24]
-		MOV		[EAX+24],EBX
-		
-		MOV		EBX,[ESP+20]
-		MOV		[EAX+28],EBX
-		
-		MOV		EBX,[ESP+16]
-		MOV		[EAX+32],EBX
-		
-		MOV		EBX,[ESP+12]
-		MOV		[EAX+36],EBX
-		
-		MOV		EBX,[ESP+8]
-		MOV		[EAX+40],EBX
-		
-		MOV		EBX,[ESP+4]
-		MOV		[EAX+44],EBX
-	
-		MOV		EBX,[ESP]
-		MOV		[EAX+48],EBX
-		
-		CALL _IRQ0_clock1
-		*/

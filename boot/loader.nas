@@ -153,6 +153,9 @@ SUCCEED:
 pipelineflush:
 		MOV		AX,SelectorData
 		MOV		DS,AX
+		MOV		ES,AX
+		MOV		FS,AX
+		MOV		GS,AX
 		MOV		AX,SelectorStack
 		MOV		SS,AX
 		MOV		ESP,topOfStack

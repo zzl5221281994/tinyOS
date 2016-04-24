@@ -1,15 +1,13 @@
 #include "hd.h                                               "
 #include "F:\work\tolset\tinyOS\kernel\debug\debug.h         "
-PUBLIC struct hardDisk_msg hardDisk_msg_buf[MAX_HD_MSG]   ;
-PUBLIC u_int32 hardDisk_msg_pos=0                         ;
 PRIVATE u_int32 hd_pid;
 PRIVATE void hd_init           (                                           );
 PRIVATE void hd_cmd_out        (struct hd_cmd* cmd                         );
-PRIVATE void hd_identify       (u_int32 driver,u_int8*liner_buf,u_int32 pos); 
-PRIVATE u_int32 hd_sector_read (u_int32 lba,u_int8*liner_buf   ,u_int32 pos);
-PRIVATE u_int32 hd_sector_write(u_int32 lba,u_int8*liner_buf   ,u_int32 pos);
+PRIVATE void hd_identify       (u_int32 driver,u_int8*liner_buf            ); 
+PRIVATE u_int32 hd_sector_read (u_int32 lba,u_int8*liner_buf               );
+PRIVATE u_int32 hd_sector_write(u_int32 lba,u_int8*liner_buf               );
 PUBLIC void hd_driver          (                                           ){
-	hd_init();
+	init_hd();
 	while(1)
 	{
 		u_int32 temp=hardDisk_msg_pos;
@@ -33,14 +31,10 @@ PUBLIC void hd_driver          (                                           ){
 		hardDisk_msg_pos=(hardDisk_msg_pos+1)%MAX_HD_MSG;
     }
 }
-PRIVATE void hd_init           (                               ){
+PRIVATE void init_hd           (                               ){
 	u_int8 *ptr=0x475;//此处保存着机器上硬盘的数量
 	assertt((*ptr)!=0);//确认机器存在硬盘
 	/*消息缓冲区全部无效*/
-	int i;
-	for(i=0;i<MAX_HD_MSG;i++)
-		hardDisk_msg_buf[i].msg_status=INVALID;
-	hd_pid=get_pid();
 }
 PRIVATE void hd_identify       (u_int32 driver,u_int8*liner_buf,u_int32 pos){
 	struct hd_cmd cmd;

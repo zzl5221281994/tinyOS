@@ -22,10 +22,12 @@ SOFTWARE.
 ************************************************************************************/
 #include "sys_call.h                                            "
 #include "F:\work\tolset\tinyOS\kernel\lib\string.h             "
-#define MAX_MSG_QUEUE  25
+/*系统调用数组*/
+PUBLIC u_int32 sys_call_table[SYS_CALL_NUM];
+/*进程表的消息队列数组*/
+#define MAX_MSG_QUEUE  35
 PRIVATE struct MESSAGE default_msg_queue[MAX_PROCESS][MAX_MSG_QUEUE]; /*pid  4~24*/
-PUBLIC u_int32 msg_queue_table[MAX_PROCESS];
-PUBLIC u_int32 send_msg(struct MESSAGE*msg,u_int32 call_pid){
+PUBLIC u_int32 send_msg(struct MESSAGE*msg,u_int32 call_pid  ){
 	assert(msg!=NULL);
 	assert((call_pid>=0)&&(call_pid<MAX_PROCESS));
 	//struct MESSAGE m;/*通过调用门访问，msg为进程的局部地址，需转换为线性地址*/
@@ -36,33 +38,76 @@ PUBLIC u_int32 send_msg(struct MESSAGE*msg,u_int32 call_pid){
 	
 	u_int32 msg_type=m_ptr->type              ;
 	u_int32 intNo   =m_ptr->u.msg_int.intNo   ;/*当该消息是中断类型时有用*/
-
-	u_int32 status=process_table[recv_pid].status;
+    u_int32 block   =m_ptr->block             ;
+	
+ 	u_int32 status=process_table[recv_pid].status;
 	if(status==STATUS_RECV_ANY)
 	{/*如果接收进程被阻塞，并处于可接受任意进程发送的消息时*/
-		memcpy8((u_int8*)m_ptr,(u_int8*)(&(process_table[recv_pid].msg)),sizeof(struct MESSAGE));/*将消息拷入msg*/
-		awake(recv_pid);
-		return TRUE;
+		memcpy8((u_int8*)m_ptr,(u_int8*)((process_table[recv_pid].msg)),sizeof(struct MESSAGE));/*将消息拷入msg*/
+		awake(recv_pid,STATUS_RECV_ANY);
+		if(block==BLOCK_NEED)/*是否需要阻塞*/
+		{
+			sleep(call_pid,STATUS_SEND_PENDING);
+			schedule();
+		}
+		else if(block==BLOCK_NOT_NEED)
+		{
+			return TRUE;
+		}
 	}
 	else if(status==STATUS_RECV_SPECIFY&&process_table[recv_pid].specify==send_pid)
 	{/*如果接收进程被阻塞，并处于可接受指定进程发送的消息且当前消息就是该指定进程发送时*/
-		memcpy8((u_int8*)m_ptr,(u_int8*)(&(process_table[recv_pid].msg)),sizeof(struct MESSAGE));
-		awake(recv_pid);
-		return TRUE;
+		memcpy8((u_int8*)m_ptr,(u_int8*)((process_table[recv_pid].msg)),sizeof(struct MESSAGE));
+		awake(recv_pid,STATUS_RECV_SPECIFY);
+		if(block==BLOCK_NEED)/*是否需要阻塞*/
+		{
+			sleep(call_pid,STATUS_SEND_PENDING);
+			schedule();
+		}
+		else if(block==BLOCK_NOT_NEED)
+		{
+			return TRUE;
+		}
 	}
 	else if(status==STATUS_RECV_INT&&send_pid==0&&msg_type==INT_MSG&&process_table[recv_pid].specify==intNo)
 	{/*如果接收进程被阻塞，并处于等待中断发生的状态*/
-		memcpy8((u_int8*)m_ptr,(u_int8*)(&(process_table[recv_pid].msg)),sizeof(struct MESSAGE));
-		awake(recv_pid);
-		return TRUE;
+		memcpy8((u_int8*)m_ptr,(u_int8*)((process_table[recv_pid].msg)),sizeof(struct MESSAGE));
+		awake(recv_pid,STATUS_RECV_INT);
+		if(block==BLOCK_NEED)/*是否需要阻塞*/
+		{
+			sleep(call_pid,STATUS_SEND_PENDING);
+			schedule();
+		}
+		else if(block==BLOCK_NOT_NEED)
+		{
+			return TRUE;
+		}
 	}
 	else
 	{/*接收进程处于未接收消息状态，将消息放入队列*/
 	    /*由于该消息并未被接收，所以发送进程应当被阻塞并执行调度程序*/
-		
-		memcpy8((u_int8*)m_ptr,(u_int8*)(&(process_table[recv_pid].msg_queue[send_pid])),sizeof(struct MESSAGE));
-		sleep(send_pid,STATUS_SEND_PENDING);
-		schedule();
+		process_table[recv_pid].msg_queue_size++;
+		if(msg_type!=INT_MSG)/*如果消息不是中断类型，则一定是某个进程发送的*/
+		{
+			memcpy8((u_int8*)m_ptr,(u_int8*)(&(process_table[recv_pid].msg_queue[send_pid+16])),sizeof(struct MESSAGE));
+			process_table[recv_pid].msg_queue_size++;
+			if(block==BLOCK_NEED)/*是否需要阻塞*/
+			{
+				sleep(send_pid,STATUS_SEND_PENDING);
+		        schedule();
+			}
+			else if(block==BLOCK_NOT_NEED)
+			{
+				return TRUE;
+			}
+		}
+		else/*消息是中断类型,中断类型是由内核发送的，一定不能阻塞*/
+		{
+			
+			memcpy8((u_int8*)m_ptr,(u_int8*)(&(process_table[recv_pid].msg_queue[intNo])),sizeof(struct MESSAGE));
+			process_table[recv_pid].msg_queue_size++;
+			return TRUE;
+		}
 	}
 }
 PUBLIC u_int32 recv_msg(struct MESSAGE*msg,u_int32 type,u_int32 specify,u_int32 call_pid){
@@ -80,23 +125,70 @@ PUBLIC u_int32 recv_msg(struct MESSAGE*msg,u_int32 type,u_int32 specify,u_int32 
 		sleep(call_pid,type);
 		schedule();
 	}
-	else if(type==STATUS_RECV_SPECIFY)
+	else if(type==STATUS_RECV_ANY)
 	{
-		if(process_table[call_pid].msg_queue[specify].msg_status==MSG_STATUS_INVALID)
+		/*队列里有消息并且欲接收任意进程发送的消息，STATUS_RECV_ANY暂定包含中断类型*/
+		int i;
+		for(i=0;i<MAX_MSG_QUEUE;i++)
+			if(process_table[call_pid].msg_queue[i].msg_status==MSG_STATUS_VALID)
+			{
+				memcpy8((u_int8*)(&(process_table[call_pid].msg_queue[i])),(u_int8*)process_table[call_pid].msg,sizeof(struct MESSAGE));
+				process_table[call_pid].msg_queue[i].msg_status=MSG_STATUS_INVALID;
+			    process_table[call_pid].msg_queue_size--;
+				return TRUE;
+			}
+	}
+	else if(type==STATUS_RECV_SPECIFY)/*想接受特定进程发送的消息*/
+	{
+		if(process_table[call_pid].msg_queue[specify+16].msg_status==MSG_STATUS_INVALID)/*特定进程并未发送消息*/
 		{
 			process_table[call_pid].specify=specify;
 			sleep(call_pid,STATUS_RECV_SPECIFY);
 			schedule();
 		}
-		else
+		else/*接收成功*/
 		{
-			
+			memcpy8((u_int8*)(&(process_table[call_pid].msg_queue[specify+16])),(u_int8*)process_table[call_pid].msg,sizeof(struct MESSAGE));
+			process_table[call_pid].msg_queue[specify+16].msg_status=MSG_STATUS_INVALID;
+			process_table[call_pid].msg_queue_size--;
+			return TRUE;
+		}
+	}
+	else if(type==STATUS_RECV_INT)/*欲接收指定中断号码的消息*/
+	{
+		if(process_table[call_pid].msg_queue[specify].msg_status==MSG_STATUS_INVALID)/*特定中断并未发送消息*/
+		{
+			process_table[call_pid].specify=specify;
+			sleep(call_pid,STATUS_RECV_INT);
+			schedule();
+		}
+		else/*接收成功*/
+		{
+			memcpy8((u_int8*)(&(process_table[call_pid].msg_queue[specify])),(u_int8*)process_table[call_pid].msg,sizeof(struct MESSAGE));
+			process_table[call_pid].msg_queue[specify].msg_status=MSG_STATUS_INVALID;
+			process_table[call_pid].msg_queue_size--;
+			return TRUE;
 		}
 	}
 }
 
 PUBLIC void init_msg_queue      (                                     ){
 	/*应该完成消息缓冲区的无效化并初始化进程表的缓冲区字段*/
+	int i,j;
+	for(i=0;i<MAX_PROCESS;i++)
+		for(j=0;j<MAX_MSG_QUEUE;j++)
+			default_msg_queue[i][j].msg_status=MSG_STATUS_INVALID;
+	for(i=0;i<MAX_PROCESS;i++)
+	{
+		process_table[i].msg_queue=&default_msg_queue[i][0];
+		process_table[i].msg_queue_size=0;
+	}
+	
+}
+PUBLIC void init_sys_call_table (                                     ){
+	sys_call_table[0]=send_msg;
+	sys_call_table[1]=recv_msg;
+	return;
 }
 PUBLIC u_int32 l_addr2liner_addr(u_int32 addr,u_int32 pid,u_int32 type){
 	if(type==0)
