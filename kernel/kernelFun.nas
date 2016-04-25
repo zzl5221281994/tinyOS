@@ -41,8 +41,6 @@
 		EXTERN _kernel_mutex
 [SECTION .text]
 _loadReg:
-		MOV		EAX,[ESP+52];DS
-		MOV		DS,AX
 		
 		MOV		EAX,[ESP+24]
 		MOV		ECX,[ESP+28]
@@ -53,6 +51,12 @@ _loadReg:
 		MOV		EDI,[ESP+48]
 		ADD		ESP,4
 		DEC		DWORD[_kernel_mutex]
+		;加载DS寄存器，由于加载后会改变数据段，因此放在IRETD前
+		PUSH	EAX
+		MOV		EAX,[ESP+52];DS
+		MOV		DS,AX
+		POP		EAX
+		;
 		IRETD
 _loadTss:
 		LTR [ESP+4]

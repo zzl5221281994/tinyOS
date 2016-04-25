@@ -1,18 +1,16 @@
 #include "hd.h                                               "
 #include "F:\work\tolset\tinyOS\kernel\debug\debug.h         "
+#include "F:\work\tolset\tinyOS\kernel\multiTask\process.h   "
+#include "F:\work\tolset\tinyOS\kernel\sys.h                 "
 PRIVATE u_int32 hd_pid;
-PRIVATE void hd_init           (                                           );
 PRIVATE void hd_cmd_out        (struct hd_cmd* cmd                         );
 PRIVATE void hd_identify       (u_int32 driver,u_int8*liner_buf            ); 
 PRIVATE u_int32 hd_sector_read (u_int32 lba,u_int8*liner_buf               );
 PRIVATE u_int32 hd_sector_write(u_int32 lba,u_int8*liner_buf               );
-PUBLIC void hd_driver          (                                           ){
-	init_hd();
+void HariMain(void){
 	while(1)
 	{
-		u_int32 temp=hardDisk_msg_pos;
-		if(hardDisk_msg[temp].msg_status==VALID)
-		{
+		    receive()
 			switch(hardDisk_msg[temp].type)
 	        {
 				case HD_IDENTIFY:
@@ -100,4 +98,5 @@ PRIVATE void hd_cmd_out        (struct hd_cmd* cmd          ){
 	while((io_in8(REG_STATUS)&STATUS_DRDY)==0);
 	/* Write the command code to the Command Register */
 	out_byte(REG_CMD,     cmd->command);
+}
 }

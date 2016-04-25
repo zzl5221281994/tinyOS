@@ -111,6 +111,7 @@ PRIVATE void SIMD_exception                 (void){
 //EAX,ECX,EDX,EBX,ESP,EBP,ESI和EDI
 PUBLIC void IRQ0_clock1                     (void){
 	global_clock++;
+	process_table[current_exec_pid].status=STATUS_NO_TIME;
 	sendEOI_Master();
 	schedule();
 }
@@ -121,7 +122,9 @@ PUBLIC void IRQ1_keyBoard1                  (void){
 	if(keyBoard_bufLen>MAX_KEYBOARD_BUF)
 		keyBoard_bufLen=0;
 	keyBoard_inPut_buf[keyBoard_bufLen]='\0';
-    //drawStr(keyBoard_inPut_buf,200,0,0x3c,0x00);
+	//test
+	//drawNum(keyBoard_bufLen,0,0,0x3c,0x00);
+   // drawStr(keyBoard_inPut_buf,200,0,0x3c,0x00);
 }
 PUBLIC void IRQ2_slave1                     (void){
 	sendEOI_Master ();
@@ -166,6 +169,7 @@ PUBLIC void IRQ12_PS2Mouse1                 (void){
 	if(mouse_bufLen>MAX_MOUSE_BUF)
 		mouse_bufLen=0;
 	mouse_inPut_buf[mouse_bufLen]='\0';
+	//test
 	//drawNum(mouse_bufLen,0,1024-100,0x3c,0x00);
 	//int i;
 	//for(i=0;i<mouse_bufLen;i++)

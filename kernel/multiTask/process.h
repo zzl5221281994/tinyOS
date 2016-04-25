@@ -35,7 +35,7 @@ struct int_msg{
 	u_int32 intNo; 
 };
 struct test_msg{
-	char str[10];
+	int8 str[10];
 };
 //消息类型
 #define HD_MSG   1

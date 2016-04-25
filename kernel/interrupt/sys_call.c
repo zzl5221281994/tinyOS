@@ -39,8 +39,10 @@ PUBLIC u_int32 send_msg(struct MESSAGE*msg,u_int32 call_pid  ){
 	u_int32 msg_type=m_ptr->type              ;
 	u_int32 intNo   =m_ptr->u.msg_int.intNo   ;/*当该消息是中断类型时有用*/
     u_int32 block   =m_ptr->block             ;
-	
+	//test
+	//test
  	u_int32 status=process_table[recv_pid].status;
+
 	if(status==STATUS_RECV_ANY)
 	{/*如果接收进程被阻塞，并处于可接受任意进程发送的消息时*/
 		memcpy8((u_int8*)m_ptr,(u_int8*)((process_table[recv_pid].msg)),sizeof(struct MESSAGE));/*将消息拷入msg*/
@@ -90,7 +92,6 @@ PUBLIC u_int32 send_msg(struct MESSAGE*msg,u_int32 call_pid  ){
 		if(msg_type!=INT_MSG)/*如果消息不是中断类型，则一定是某个进程发送的*/
 		{
 			memcpy8((u_int8*)m_ptr,(u_int8*)(&(process_table[recv_pid].msg_queue[send_pid+16])),sizeof(struct MESSAGE));
-			process_table[recv_pid].msg_queue_size++;
 			if(block==BLOCK_NEED)/*是否需要阻塞*/
 			{
 				sleep(send_pid,STATUS_SEND_PENDING);
@@ -105,7 +106,6 @@ PUBLIC u_int32 send_msg(struct MESSAGE*msg,u_int32 call_pid  ){
 		{
 			
 			memcpy8((u_int8*)m_ptr,(u_int8*)(&(process_table[recv_pid].msg_queue[intNo])),sizeof(struct MESSAGE));
-			process_table[recv_pid].msg_queue_size++;
 			return TRUE;
 		}
 	}
@@ -185,9 +185,22 @@ PUBLIC void init_msg_queue      (                                     ){
 	}
 	
 }
+//TEST
+PUBLIC void draw(u_int8* str,u_int32 key,u_int32 pid){
+	u_int8*ptr=(u_int8*)l_addr2liner_addr((u_int32)str,pid,1);
+	if(key==0)
+		drawStr(ptr,0,100,0x2e,0x3c);
+	else if(key==1)
+		drawStr(ptr,200,100,0x1e,0x3c);
+}
+//TEST
 PUBLIC void init_sys_call_table (                                     ){
 	sys_call_table[0]=send_msg;
 	sys_call_table[1]=recv_msg;
+	//test
+	sys_call_table[2]=sleep;
+	sys_call_table[3]=awake;
+	sys_call_table[4]=draw;
 	return;
 }
 PUBLIC u_int32 l_addr2liner_addr(u_int32 addr,u_int32 pid,u_int32 type){

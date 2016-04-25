@@ -38,6 +38,7 @@ PUBLIC struct main_idt       idt;
 PUBLIC u_int8  *vram8 =NULL     ;
 PUBLIC u_int32 *vram32=NULL     ;
 PUBLIC u_int32 time=0           ;
+PUBLIC u_int32 serverNum=0      ;
 //static u_int8* tinyOS_str1="\nWed Mar 30 22 50 57 2016\n\nMIT License\nCopyright c 2016 zhuzuolang\n\nPermission is hereby granted free of charge to any person obtaining a copy\nof this software and associated documentation files the Software to deal\nin the Software without restriction including without limitation the rights\nto use copy modify merge publish distribute sublicense and or sell\ncopies of the Software and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software \nTHE SOFTWARE IS PROVIDED AS IS WITHOUT WARRANTY OF ANY KIND EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY WHETHER IN AN ACTION OF CONTRACT TORT OR OTHERWISE ARISING FROM \nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE\n\nWed Mar 30 22 50 57 2016\n\nMIT License\nCopyright c 2016 zhuzuolang\n\nPermission is hereby granted free of charge to any person obtaining a copy\nof this software and associated documentation files the Software to deal\nin the Software without restriction including without limitation the rights\nto use copy modify merge publish distribute sublicense and or sell\ncopies of the Software and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software \nTHE SOFTWARE IS PROVIDED AS IS WITHOUT WARRANTY OF ANY KIND EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY WHETHER IN AN ACTION OF CONTRACT TORT OR OTHERWISE ARISING FROM \nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE\n";
 void drawInfo();
 void testA();
@@ -102,9 +103,11 @@ void HariMain(void)
 	hd_sector_read(0,buf,0);
 	hd_sector_read(1,buf1,0);
 	u_int32 pid1=createServer(boot_info.codeBase+testA,1);
+	serverNum+=1;                             
 	//pid1=createServer(boot_info.codeBase+testB,1);
-	u_int32 pid2=createProcess((u_int8*)buf,512,1,1);
-	u_int32 pid3=createProcess((u_int8*)buf1,512,1,1);
+	//serverNum+=2
+	u_int32 pid2=createProcess((u_int8*)buf,512,1,3);
+	u_int32 pid3=createProcess((u_int8*)buf1,512,1,3);
 	
 	//drawInfo();
 	//drawNum(pid1,0,0,0x3c,0x00);
@@ -120,8 +123,8 @@ void testB(){
 	{
 		*(vram8+l)=0x3c;
 		int i,j,key=0;
-	//for(i=0;i<10;i++)
-		for(j=0;j<10000;j++)
+	for(i=0;i<10;i++)
+		for(j=0;j<1000;j++)
 			   key+=i+j;
 		l++;
 	}
@@ -130,10 +133,10 @@ void testA(){
 	u_int32 l=0;
 	while(1)
 	{
-		*(vram8+l+1024*500)=0x1f;
+		*(vram8+l)=0x1f;
 		int i,j,key=0;
 	for(i=0;i<10;i++)
-		for(j=0;j<10000;j++)
+		for(j=0;j<1000;j++)
 			   key+=i+j;
 		l++;
 	}

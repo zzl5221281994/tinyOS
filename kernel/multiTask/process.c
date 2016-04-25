@@ -1,6 +1,7 @@
 #include "process.h"
 #include "F:\work\tolset\tinyOS\kernel\bootInfo\bootInfo.h          "
 #include "F:\work\tolset\tinyOS\kernel\lib\string.h                 "
+#include "F:\work\tolset\tinyOS\kernel\interrupt\interrupt.h        "
 #include "F:\work\tolset\tinyOS\kernel\debug\debug.h                "
 #include "F:\work\tolset\tinyOS\kernel\kernelFun.h                  "
 PUBLIC struct proc_table process_table[MAX_PROCESS];
@@ -9,7 +10,9 @@ PUBLIC u_int32 current_exec_pid=0                  ;
 PUBLIC u_int32 process_table_len=1                 ;
 PRIVATE u_int32 base    =0x1000000                 ;
 PRIVATE u_int32 allo_len=0xFFFF                    ;
-
+//test
+u_int32 schedule_num=0;
+//test
 PUBLIC void init_tss(){
 	/*全局只有一个TSS*/
 	u_int32 tss_sel=addDes(0,0xfffff,SegDesc_Property_32 |SegDesc_Property_4KB|SegDesc_Property_RW);
@@ -17,18 +20,26 @@ PUBLIC void init_tss(){
 	global_tss.esp0=0x1000000;
 	global_tss.iobase=104;
 	u_int32 sel=addDes((u_int32)(&global_tss),103,SegDesc_Property_386TSS);
+	process_table[0].current_time=1;
+	process_table[0].max_time=1;
 	loadTss(sel*8);
 }
 PUBLIC void schedule(){
+	//test
+	kernel_mutex++;
+	schedule_num++;
+	//drawNum(current_exec_pid,(16*((schedule_num*64)/1024))%768,(schedule_num*64)%1024,0x3c,0x00);
 	/*进程调度*/
 	process_table[current_exec_pid].current_time--;
-	if(process_table[current_exec_pid].current_time==0)
+	
+	if(process_table[current_exec_pid].current_time==0||(process_table[current_exec_pid].status!=STATUS_NO_TIME))
 	{
 		process_table[current_exec_pid].current_time=process_table[current_exec_pid].max_time;
 		current_exec_pid=(current_exec_pid+1)%process_table_len;
+		while(process_table[current_exec_pid].status!=STATUS_NO_TIME||current_exec_pid==0)
+			current_exec_pid=(current_exec_pid+1)%process_table_len;
 	}
-	if(current_exec_pid==0)
-		current_exec_pid++;
+	process_table[current_exec_pid].status=STATUS_EXEC;
 	/*进程切换*/
 	loadLdt((process_table[current_exec_pid].ldtSelector)*8);
     
@@ -93,7 +104,7 @@ PUBLIC int32 createProcess(u_int8*hrb_buf,u_int32 buf_len,u_int32 max_time,u_int
 	u_int32 data_pos  =*(u_int32*)(hrb_buf+20);//数据在可执行文件中的偏移
 	u_int32 data_start=*(u_int32*)(hrb_buf+12);//得到数据在数据段中的开始位置
 	/*该进程的特权级,createProcess函数无法创建特权级为1的进程，只有createServer才行*/
-	assert(DPL==2||DPL==3||DPL==1);
+assert(DPL==2||DPL==3);
 	u_int32 proc_dpl,proc_rpl;
 	if(DPL==1)
 	{
@@ -120,29 +131,30 @@ PUBLIC int32 createProcess(u_int8*hrb_buf,u_int32 buf_len,u_int32 max_time,u_int
 	process_table[process_table_len].codeBase=base;
 	base+=allo_len+1;
 	
+	//建立LDT堆栈段
+	gen_normalDescriptor(desc,base,allo_len,SegDesc_Property_RW|SegDesc_Property_32|proc_dpl    );
+	memcpy8(desc,process_table[process_table_len].ldtDescriptor[1],8);
+	process_table[process_table_len].stackBase=base;
+	base+=allo_len+1;
+	
+	
 	//建立LDT数据段
 	/*建立LDT描述符*/
 	gen_normalDescriptor(desc,base,allo_len,SegDesc_Property_RW|SegDesc_Property_32|proc_dpl    );
-	memcpy8(desc,process_table[process_table_len].ldtDescriptor[1],8);
+	memcpy8(desc,process_table[process_table_len].ldtDescriptor[2],8);
 	/*拷贝数据*****/
 	memcpy8((u_int8*)(hrb_buf+data_pos),(u_int8*)(base+data_start),data_len);
 	process_table[process_table_len].dataBase=base;
 	base+=allo_len+1;
 	
-	//建立LDT堆栈段
-	gen_normalDescriptor(desc,base,allo_len,SegDesc_Property_RW|SegDesc_Property_32|proc_dpl    );
-	memcpy8(desc,process_table[process_table_len].ldtDescriptor[2],8);
-	process_table[process_table_len].stackBase=base;
-	base+=allo_len+1;
 	
 	/*初始化进程初始信息*/
 	process_table[process_table_len].frame.esp   =0xffff;
 	process_table[process_table_len].frame.eip   =0x001b;
 	process_table[process_table_len].frame.eflags=INIT_EFLAGS;
-	process_table[process_table_len].frame.ss    =2*8+Selector_TI_Ldt+proc_rpl;
+	process_table[process_table_len].frame.ss    =1*8+Selector_TI_Ldt+proc_rpl;
 	process_table[process_table_len].frame.cs    =0*8+Selector_TI_Ldt+proc_rpl;
-	process_table[process_table_len].frame.ds    =KERNEL_DATA_INDEX*8+proc_rpl;
-	//process_table[process_table_len].frame.ds    =1*8+Selector_TI_Ldt+proc_rpl;
+	process_table[process_table_len].frame.ds    =2*8+Selector_TI_Ldt+proc_rpl;
 	process_table[process_table_len].pid         =process_table_len;
 	process_table[process_table_len].status      =STATUS_NO_TIME;
 	//ldtDescriptor

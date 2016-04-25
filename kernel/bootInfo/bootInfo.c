@@ -90,10 +90,10 @@ PUBLIC int init_idt     (                                                       
 	u_int8 desc[8];
 	int i;
 	//int0~int19                   CPU异常
-	for(i=0;i<20;i++){
-		gen_gateDescriptor(desc,8,exception_hander[i],0,SegDesc_Property_386IGate);
-		memcpy8(desc,(u_int8*)(&(idt.idtDescriptor[i])),8);
-	}
+	//for(i=0;i<20;i++){
+	//	gen_gateDescriptor(desc,8,exception_hander[i],0,SegDesc_Property_386IGate);
+	//	memcpy8(desc,(u_int8*)(&(idt.idtDescriptor[i])),8);
+	//}
 	//int20~int 0x1f               intel保留
 	for(i=20;i<0x20;i++){
 		gen_gateDescriptor(desc,8,hander,0,SegDesc_Property_386IGate);

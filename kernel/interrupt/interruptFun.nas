@@ -37,12 +37,20 @@
 		EXTERN _sys_call_table
 		EXTERN _global_clock
 		EXTERN  _sendEOI_Master
+		EXTERN _serverNum
 [SECTION .text]
+selectorKernelData 	EQU		2*8+1
+selectorUserData 	EQU		2*8+4+3
 _getErrorCode:
 		MOV		EAX,[ESP+4]
 		RET
 _sys_call:;该调用通过INT指令访问系统调用，由于系统调用里面可能会导致进程阻塞，因此需要保存上下文。
           ;ebx,ecx,edx,esi,分别保存则4个参数，eax保存着调用号
+		PUSH	EAX
+		MOV		AX,selectorKernelData
+		MOV		DS,AX
+		POP		EAX
+		
 		PUSHAD
 		CALL	_save_context
 		PUSH	ESI
@@ -56,6 +64,11 @@ _sys_call:;该调用通过INT指令访问系统调用，由于系统调用里面
 		ADD		ESP,4
 		POPAD
 		MOV		EAX,[ESP-32];取出压入栈中的返回参数
+		
+		PUSH	EAX
+		MOV		AX,selectorUserData
+		MOV		DS,AX
+		POP		EAX
 		IRETD
 _save_context:
 ;使用规则
@@ -68,57 +81,63 @@ _save_context:
 ;call _save_context
 		PUSH    EAX
 		PUSH	EBX
+		PUSH	EDX
 		MOV		EAX,164
 		MUL     DWORD[_current_exec_pid]
 		ADD 	EAX,_process_table
 		ADD		EAX,16
 		;保存现场信息
-		MOV		EBX,[ESP+60]
+		MOV		EBX,[ESP+64]
 		MOV		[EAX],EBX
 		
-		MOV		EBX,[ESP+56]
+		MOV		EBX,[ESP+60]
 		MOV		[EAX+4],EBX
 		
-		MOV		EBX,[ESP+52]
+		MOV		EBX,[ESP+56]
 		MOV		[EAX+8],EBX
 		
-		MOV		EBX,[ESP+48]
+		MOV		EBX,[ESP+52]
 		MOV		[EAX+12],EBX
 		
-		MOV		EBX,[ESP+44]
+		MOV		EBX,[ESP+48]
 		MOV		[EAX+16],EBX
 		
-		MOV		EBX,[ESP+40]
+		MOV		EBX,[ESP+44]
 		MOV		[EAX+20],EBX
 		
-		MOV		EBX,[ESP+36]
+		MOV		EBX,[ESP+40]
 		MOV		[EAX+24],EBX
 		
-		MOV		EBX,[ESP+32]
+		MOV		EBX,[ESP+36]
 		MOV		[EAX+28],EBX
 		
-		MOV		EBX,[ESP+28]
+		MOV		EBX,[ESP+32]
 		MOV		[EAX+32],EBX
 		
-		MOV		EBX,[ESP+24]
+		MOV		EBX,[ESP+28]
 		MOV		[EAX+36],EBX
 		
-		MOV		EBX,[ESP+20]
+		MOV		EBX,[ESP+24]
 		MOV		[EAX+40],EBX
 		
-		MOV		EBX,[ESP+16]
+		MOV		EBX,[ESP+20]
 		MOV		[EAX+44],EBX
 	
-		MOV		EBX,[ESP+12]
+		MOV		EBX,[ESP+16]
 		MOV		[EAX+48],EBX
 		
+		POP		EDX
 		POP		EBX
 		POP		EAX
 		RET
 _IRQ0_clock:
-		CMP		DWORD[_kernel_mutex],0
+		PUSH	EAX
+		MOV		AX,selectorKernelData
+		MOV		DS,AX
+		POP		EAX
+		
+		CMP		DWORD [_kernel_mutex],0
 		JNE		L1
-		INC		DWORD[_kernel_mutex]
 		PUSHAD
 		;保存上下文
 		CALL    _save_context
@@ -129,13 +148,34 @@ _IRQ0_clock:
 		INC		DWORD[_global_clock]
 		IRETD
 _IRQ1_keyBoard:
-		INC		DWORD[_kernel_mutex]
+		;注意，由于允许中断重入，因此需要判断中断重入的层数来决定是否需要加载内核DS寄存器
+		PUSH	EAX
+		MOV		AX,selectorKernelData
+		MOV		DS,AX
+		POP		EAX
+		;CMP		DWORD[_kernel_mutex],0
+		;JNE     L1_1
+		;该段代码在每一个中断前都存在
+	;L1_1:
+     	INC		DWORD[_kernel_mutex]
 		PUSHAD
 		STI
 		CALL _IRQ1_keyBoard1
 		CLI
 		POPAD
 		DEC		DWORD[_kernel_mutex]
+		;注意，由于允许中断重入，因此需要判断中断重入的层数来决定是否需要加载用户DS寄存器
+		PUSH	EAX
+		CMP		DWORD[_kernel_mutex],0
+		JNE     L1_2
+		MOV		EAX,DWORD[_serverNum]
+		CMP		DWORD[_current_exec_pid],EAX
+		JBE	    L1_2
+		MOV		AX,selectorUserData
+		MOV		DS,AX
+		;该段代码在每一个中断前都存在
+	L1_2:
+		POP		EAX
 		IRETD
 _IRQ2_slave:
 		PUSHAD
@@ -189,14 +229,34 @@ _IRQ11_reserved2:
 		POPAD
 		IRETD
 _IRQ12_PS2Mouse:
-        INC		DWORD[_kernel_mutex]
+       ;注意，由于允许中断重入，因此需要判断中断重入的层数来决定是否需要加载内核DS寄存器
+	    PUSH	EAX
+		MOV		AX,selectorKernelData
+		MOV		DS,AX
+		POP		EAX
+		;CMP		DWORD[_kernel_mutex],0
+		;JNE     L12_1
+		;该段代码在每一个中断前都存在
+       ; L12_1:
+		INC		DWORD[_kernel_mutex]
 		PUSHAD
 		STI
 		CALL _IRQ12_PS2Mouse1
 		CLI
 		POPAD
 		DEC		DWORD[_kernel_mutex]
-	L2:
+		;注意，由于允许中断重入，因此需要判断中断重入的层数来决定是否需要加载用户DS寄存器
+		PUSH	EAX
+		CMP		DWORD[_kernel_mutex],0
+		JNE     L12_2
+		MOV		EAX,DWORD[_serverNum]
+		CMP		DWORD[_current_exec_pid],EAX
+		JBE	    L12_2
+		MOV		AX,selectorUserData
+		MOV		DS,AX
+		;该段代码在每一个中断前都存在
+	L12_2:
+		POP		EAX
 		IRETD
 _IRQ13_FPU_error:
 		PUSHAD
