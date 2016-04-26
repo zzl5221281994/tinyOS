@@ -26,7 +26,6 @@ SOFTWARE.
 #include "bootInfo\bootInfo.h  "
 #include "kernelFun.h          "
 #include "interrupt\interrupt.h"
-#include "interrupt\clock.h    "
 #include "multiTask\process.h  "
 #include "IO\IO.h              "
 #include "drivers\hd.h         "
@@ -45,6 +44,8 @@ void testA();
 void testB();
 void testC();
 /*************************************************************************************/
+/*此段硬盘相关的代码来自于硬盘驱动程序，在这儿的目的主要是加载磁盘上的第一个系统服务进程用，即磁盘驱动程序。
+因为第一个进程必须由内核加载*/
 PRIVATE void init_hd           (                               ){
 	u_int8 *ptr=0x475;//此处保存着机器上硬盘的数量
 	assert((*ptr)!=0);//确认机器存在硬盘
@@ -82,8 +83,9 @@ PRIVATE u_int32 hd_sector_read (u_int32 lba,u_int16*liner_buf,u_int32 pos){
 }
 
 /*************************************************************************************/
-u_int16 buf[256];
-u_int16 buf1[256];
+u_int16 hd_buf[768];
+u_int16 buf1[768];
+u_int16 buf3[256];
 /*内核入口*/
 void HariMain(void)
 {
@@ -99,20 +101,31 @@ void HariMain(void)
 	init_tss();	
 	init_msg_queue();
 	init_sys_call_table();
+	init_process_table();
+	//test 
 	init_hd();
-	hd_sector_read(0,buf,0);
-	hd_sector_read(1,buf1,0);
-	u_int32 pid1=createServer(boot_info.codeBase+testA,1);
-	serverNum+=1;                             
-	//pid1=createServer(boot_info.codeBase+testB,1);
-	//serverNum+=2
-	u_int32 pid2=createProcess((u_int8*)buf,512,1,3);
-	u_int32 pid3=createProcess((u_int8*)buf1,512,1,3);
+	hd_sector_read(0,hd_buf,0);
+	io_delay();
+	hd_sector_read(1,hd_buf+256,0);
+	io_delay();
+	hd_sector_read(2,hd_buf+512,0);
+	io_delay();
+	hd_sector_read(3,buf1,0);
+	io_delay();
+	hd_sector_read(4,buf1+256,0);
+	hd_sector_read(5,buf1+512,0);
+	//hd_sector_read(0,buf1,0);
+	//int i;
+	//for(i=0;i<256;i++)
+	//	drawNum(buf1[i],16*((64*i)/1024),(64*i)%1024,0x3c,0x00);
+	u_int32 pid2=createServer((u_int8*)hd_buf,1536,1,1);
 	
+	createProcess((u_int8*)buf1,1024,1,3);
+	//createProcess((u_int8*)buf3,512,1,3);
 	//drawInfo();
 	//drawNum(pid1,0,0,0x3c,0x00);
-	//drawNum(pid2,0,100,0x3c,0x00);
-	//drawNum(pid3,0,200,0x3c,0x00);
+	//drawNum(pid2,0,400,0x3c,0x00);
+	//drawNum(pid3,0,500,0x3c,0x00);
 	open_interrupt();
 	while(1)
 		io_hlt();

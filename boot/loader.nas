@@ -27,11 +27,11 @@ org 0x7e00
 %include "boot\memory_map.inc   ";此文件包含获取内存分布图的代码，并将得到的内存分布图数据结构保存在0x7020开始的内存里
 	JMP		LABEL_BEGIN
 ;BeginFunctionBlock		各段基地址
-;                                       |1MB~~~~~~5MB|  |5MB~~~~~~~~~~~10MB|   
+;                                       |1MB~~~~~~5MB|  |5MB~~~~~~~~~~~10MB|  
 ;                                           |代码|       |数据---> <---栈|
 KERNEL_SEG_BASE		EQU		0X100000
 DATA_SEG_BASE		EQU 	0X000000
-topOfStack          EQU     0X1000000
+topOfStack          EQU     0XA00000
 numOfGdts           EQU     0x0000004
 screenHeight        EQU     768
 screenWidth         EQU     1024  
@@ -42,7 +42,7 @@ screenWidth         EQU     1024
 ;                                    			段基址                段长          属性
 LABEL_GDT        :		Descriptor					0,     		        0,		     0
 LABEL_DESC_CODE32:		Descriptor	  KERNEL_SEG_BASE,             0ffffh,         SegDesc_Property_32 |SegDesc_Property_EXEC_R
-LABEL_DESC_DATA  :      Descriptor   	DATA_SEG_BASE,            0fffffh,         SegDesc_Property_32 |SegDesc_Property_4KB|SegDesc_Property_RW|SegDesc_Property_DPL3
+LABEL_DESC_DATA  :      Descriptor   	DATA_SEG_BASE,            0fffffh,         SegDesc_Property_32 |SegDesc_Property_4KB|SegDesc_Property_RW|SegDesc_Property_DPL1
 LABEL_DESC_STACK :      Descriptor                  0,            0fffffh,         SegDesc_Property_32 |SegDesc_Property_4KB|SegDesc_Property_RW
 
 GdtLen       equ            $-LABEL_GDT                         ;GDT 长度

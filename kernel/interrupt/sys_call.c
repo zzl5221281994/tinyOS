@@ -22,10 +22,12 @@ SOFTWARE.
 ************************************************************************************/
 #include "sys_call.h                                            "
 #include "F:\work\tolset\tinyOS\kernel\lib\string.h             "
+#include "F:\work\tolset\tinyOS\kernel\multiTask\process.h      "
+#include "F:\work\tolset\tinyOS\kernel\multiTask\message.h      "
 /*系统调用数组*/
 PUBLIC u_int32 sys_call_table[SYS_CALL_NUM];
 /*进程表的消息队列数组*/
-#define MAX_MSG_QUEUE  35
+#define MAX_MSG_QUEUE  36
 PRIVATE struct MESSAGE default_msg_queue[MAX_PROCESS][MAX_MSG_QUEUE]; /*pid  4~24*/
 PUBLIC u_int32 send_msg(struct MESSAGE*msg,u_int32 call_pid  ){
 	assert(msg!=NULL);
@@ -109,6 +111,7 @@ PUBLIC u_int32 send_msg(struct MESSAGE*msg,u_int32 call_pid  ){
 			return TRUE;
 		}
 	}
+	return FALSE;
 }
 PUBLIC u_int32 recv_msg(struct MESSAGE*msg,u_int32 type,u_int32 specify,u_int32 call_pid){
 	/*type=STATUS_RECV_ANY，    specify无效  */
@@ -170,6 +173,7 @@ PUBLIC u_int32 recv_msg(struct MESSAGE*msg,u_int32 type,u_int32 specify,u_int32 
 			return TRUE;
 		}
 	}
+	return FALSE;
 }
 
 PUBLIC void init_msg_queue      (                                     ){
@@ -186,21 +190,33 @@ PUBLIC void init_msg_queue      (                                     ){
 	
 }
 //TEST
-PUBLIC void draw(u_int8* str,u_int32 key,u_int32 pid){
+PRIVATE u_int32 draw(u_int8* str,u_int32 key,u_int32 pid){
 	u_int8*ptr=(u_int8*)l_addr2liner_addr((u_int32)str,pid,1);
 	if(key==0)
 		drawStr(ptr,0,100,0x2e,0x3c);
 	else if(key==1)
 		drawStr(ptr,200,100,0x1e,0x3c);
+	return TRUE;
+	
+}
+PRIVATE u_int32 get_pid(                               ){
+	return current_exec_pid;
+}
+PRIVATE void dNum(u_int32 num,u_int32 x,u_int32 y      ){
+	drawNum(num,x,y,0x1f,0x00);
 }
 //TEST
 PUBLIC void init_sys_call_table (                                     ){
-	sys_call_table[0]=send_msg;
-	sys_call_table[1]=recv_msg;
+	sys_call_table[0]=(u_int32)send_msg;
+	sys_call_table[1]=(u_int32)recv_msg;
 	//test
-	sys_call_table[2]=sleep;
-	sys_call_table[3]=awake;
-	sys_call_table[4]=draw;
+	sys_call_table[2]=(u_int32)sleep            ;
+	sys_call_table[3]=(u_int32)awake            ;
+	sys_call_table[4]=(u_int32)draw             ;
+	sys_call_table[5]=(u_int32)l_addr2liner_addr;
+	sys_call_table[6]=(u_int32)get_pid          ;
+	sys_call_table[7]=(u_int32)assertion_failure;
+	sys_call_table[8]=(u_int32)dNum             ;
 	return;
 }
 PUBLIC u_int32 l_addr2liner_addr(u_int32 addr,u_int32 pid,u_int32 type){

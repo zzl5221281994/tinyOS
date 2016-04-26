@@ -27,9 +27,9 @@ SOFTWARE.
 #include "F:\work\tolset\tinyOS\kernel\graphics\font.h       "
 #include "F:\work\tolset\tinyOS\kernel\IO\IO.h               "
 #include "F:\work\tolset\tinyOS\kernel\multiTask\process.h   "
+#include "F:\work\tolset\tinyOS\kernel\multiTask\message.h   "
 #include "F:\work\tolset\tinyOS\kernel\drivers\hd.h          "
 #include "interrupt.h                                        "
-#include "clock.h                                            "
 #define EXCEPTION_HANDERS_NUM 20
 #define INTERRUPT_HANDERS_NUM 16
 #define DEFAULT_ERRORCODE     8888
@@ -123,7 +123,7 @@ PUBLIC void IRQ1_keyBoard1                  (void){
 		keyBoard_bufLen=0;
 	keyBoard_inPut_buf[keyBoard_bufLen]='\0';
 	//test
-	//drawNum(keyBoard_bufLen,0,0,0x3c,0x00);
+	drawNum(keyBoard_bufLen,0,0,0x3c,0x00);
    // drawStr(keyBoard_inPut_buf,200,0,0x3c,0x00);
 }
 PUBLIC void IRQ2_slave1                     (void){
@@ -179,11 +179,18 @@ PUBLIC void IRQ13_FPU_error1                (void){
 	sendEOI_Slave  ();
 	sendEOI_Master ();
 }
-extern u_int16 buf[];
 PUBLIC void IRQ14_ATDisk1                   (void){
 	sendEOI_Slave  ();
 	sendEOI_Master ();
-	drawStr("ata",184,0,0x3c,0x00);
+	u_int8 status=io_in8(REG_STATUS);
+	/*此处应该加入对状态的错误与否来发送消息*/
+	struct MESSAGE msg;
+	struct int_msg intMsg;
+	intMsg.intNo=14;
+	intMsg.status=status;
+	make_msg(&msg,0,1,INT_MSG,BLOCK_NOT_NEED);
+	msg.u.msg_int=intMsg;
+	send_msg(&msg,0);
 }
 PUBLIC void IRQ15_reserved31                (void){
 	sendEOI_Slave  ();

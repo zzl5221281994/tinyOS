@@ -29,25 +29,51 @@
 		GLOBAL  _setGdt,_setIdt
 		GLOBAL	_io_in8,  _io_in16,  _io_in32
 		GLOBAL	_io_out8, _io_out16, _io_out32
+		GLOBAL  _io_delay
+		GLOBAL  _port_read,_port_write
+		
 		GLOBAL  _load_master_maskWord
 		GLOBAL  _load_slave_maskWord
-		GLOBAL  _io_delay
+		GLOBAL  _loadTss,_loadLdt,_loadReg,_runProcess
 		GLOBAL  _hander,_sendEOI_Master,_sendEOI_Slave
 		GLOBAL  _open_interrupt,_close_interrupt
-		EXTERN  _drawNum
-		EXTERN  _time
-		GLOBAL  _error_test
+		
+		EXTERN _kernel_mutex
 [SECTION .text]
-_error_test:
+_loadReg:
+		
+		MOV		EAX,[ESP+24]
+		MOV		ECX,[ESP+28]
+		MOV		EDX,[ESP+32]
+		MOV		EBX,[ESP+36]
+		MOV		EBP,[ESP+40]
+		MOV		ESI,[ESP+44]
+		MOV		EDI,[ESP+48]
+		ADD		ESP,4
+		DEC		DWORD[_kernel_mutex]
+		;加载DS寄存器，由于加载后会改变数据段，因此放在IRETD前
+		PUSH	EAX
+		MOV		EAX,[ESP+52];DS
+		MOV		DS,AX
+		POP		EAX
+		;
+		IRETD
+_loadTss:
+		LTR [ESP+4]
+		RET
+_loadLdt:
+		LLDT [ESP+4]
 		RET
 _open_interrupt:
 		STI
-		RET
+		POP		EAX
+		JMP		EAX
 _close_interrupt:
 		CLI
-		RET
+		POP		EAX
+		JMP		EAX
 _sendEOI_Master:
-		MOV		AL,0X20
+		MOV		AL,0x20
 		OUT		20H,AL
 		NOP
 		NOP
@@ -55,7 +81,7 @@ _sendEOI_Master:
 		NOP
 		RET
 _sendEOI_Slave:
-		MOV		AL,0X20
+		MOV		AL,0x20
 		OUT		0XA0,AL
 		NOP
 		NOP
@@ -64,15 +90,6 @@ _sendEOI_Slave:
 		RET
 _hander:
 		CLI
-		PUSH	0X00
-		PUSH	0X3C
-		PUSH	200
-		PUSH	200
-		;PUSH	1234
-		PUSH	DWORD[_time]
-		CALL    _drawNum
-		ADD		ESP,20
-		INC     DWORD[_time]
 		CALL 	_sendEOI_Master
 		STI
 		IRETD
@@ -133,6 +150,31 @@ _io_out32:	                    ; void io_out32(int port, int data);
 		MOV		EDX,[ESP+4]		; port
 		MOV		EAX,[ESP+8]		; data
 		OUT		DX,EAX
+		RET
+; ========================================================================
+;                  void port_read(u16 port, void* buf, int n);
+; ========================================================================
+_port_read:
+		PUSHAD
+	    MOV	EDX, [ESP + 4]	; port
+		MOV	EDI, [ESP + 8]	; buf
+		MOV	ECX, [ESP + 12]	; n
+		SHR ECX, 1
+		CLD
+		REP INSW
+		POPAD
+		RET
+
+; ========================================================================
+;                  void port_write(u16 port, void* buf, int n);
+; ========================================================================
+_port_write:
+		MOV	EDX, [ESP+4]		; port
+		MOV ESI, [ESP+8]	; buf
+		MOV	ECX, [ESP+12]	; n
+		SHR ECX, 1
+		CLD
+		REP OUTSW
 		RET
 _io_delay:
 		NOP

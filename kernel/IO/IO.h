@@ -32,6 +32,4 @@ extern u_int32 keyBoard_bufLen  ;
 //鼠标数据缓冲区
 extern u_int8 mouse_inPut_buf[] ;
 extern u_int32 mouse_bufLen     ;
-
-
 #endif

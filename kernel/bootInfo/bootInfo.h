@@ -66,6 +66,7 @@ extern  int init_idt     (                                                      
 extern  int init_8259A   (                                                             );
 extern void init_pit     (u_int32 timesPerSecond                                       );
 extern void init_mouse   (                                                             );
+extern void init_keyboard(                                                             );
 extern  int set_pattle   (                                                             );
 
 /*

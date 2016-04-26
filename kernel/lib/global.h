@@ -101,6 +101,7 @@ CRO:
 #define KERNEL_CODE_INDEX       1
 #define KERNEL_DATA_INDEX       2
 #define KERNEL_STACK_INDEX      3
+#define topOfstack_kernel       0XA00000
 //;----------------------------------------------------------------------------
 //全局使用的常量,函数的宏定义
 #define NULL    0

@@ -40,7 +40,7 @@
 		EXTERN _serverNum
 [SECTION .text]
 selectorKernelData 	EQU		2*8+1
-selectorUserData 	EQU		2*8+4+3
+selectorUserData 	EQU		2*8+4+1
 _getErrorCode:
 		MOV		EAX,[ESP+4]
 		RET
@@ -63,7 +63,7 @@ _sys_call:;该调用通过INT指令访问系统调用，由于系统调用里面
 		PUSH	EAX
 		ADD		ESP,4
 		POPAD
-		MOV		EAX,[ESP-32];取出压入栈中的返回参数
+		MOV		EAX,[ESP-36];取出压入栈中的返回参数
 		
 		PUSH	EAX
 		MOV		AX,selectorUserData
@@ -148,7 +148,7 @@ _IRQ0_clock:
 		INC		DWORD[_global_clock]
 		IRETD
 _IRQ1_keyBoard:
-		;注意，由于允许中断重入，因此需要判断中断重入的层数来决定是否需要加载内核DS寄存器
+		;
 		PUSH	EAX
 		MOV		AX,selectorKernelData
 		MOV		DS,AX
@@ -168,9 +168,9 @@ _IRQ1_keyBoard:
 		PUSH	EAX
 		CMP		DWORD[_kernel_mutex],0
 		JNE     L1_2
-		MOV		EAX,DWORD[_serverNum]
-		CMP		DWORD[_current_exec_pid],EAX
-		JBE	    L1_2
+		;MOV		EAX,DWORD[_serverNum]
+		;CMP		DWORD[_current_exec_pid],EAX
+		;JBE	    L1_2
 		MOV		AX,selectorUserData
 		MOV		DS,AX
 		;该段代码在每一个中断前都存在
@@ -229,7 +229,7 @@ _IRQ11_reserved2:
 		POPAD
 		IRETD
 _IRQ12_PS2Mouse:
-       ;注意，由于允许中断重入，因此需要判断中断重入的层数来决定是否需要加载内核DS寄存器
+       ;
 	    PUSH	EAX
 		MOV		AX,selectorKernelData
 		MOV		DS,AX
@@ -249,9 +249,9 @@ _IRQ12_PS2Mouse:
 		PUSH	EAX
 		CMP		DWORD[_kernel_mutex],0
 		JNE     L12_2
-		MOV		EAX,DWORD[_serverNum]
-		CMP		DWORD[_current_exec_pid],EAX
-		JBE	    L12_2
+		;MOV		EAX,DWORD[_serverNum]
+		;CMP		DWORD[_current_exec_pid],EAX
+		;JBE	    L12_2
 		MOV		AX,selectorUserData
 		MOV		DS,AX
 		;该段代码在每一个中断前都存在
