@@ -1,3 +1,25 @@
+/************************************************************************************
+Wed Apr 27 10:18:23 2016
+
+MIT License
+Copyright (c) 2016 zhuzuolang
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+************************************************************************************/
 #include "hd.h                                                    "
 #include "F:\work\tolset\tinyOS\kernel\user_lib\user_lib.h        "
 #include "F:\work\tolset\tinyOS\kernel\user_lib\user_sys_call.h   "
@@ -22,9 +44,6 @@ void HariMain(void){
 			awake(msg_recv.send_pid,FALSE);
 		}
 	}
-	//test
-	u_int32 num=0;
-	//test
 	while(1)
 	{
 		    receive(&msg_recv,STATUS_RECV_ANY,0,hd_pid);
@@ -32,7 +51,7 @@ void HariMain(void){
 			u_int32 send_pid=msg_recv.send_pid;
 			switch(msg_type)
 	        {
-				case HD_MSG:
+				case HD_MSG_TYPE:
 				{
 					u_int32 hd_type=msg_recv.u.msg_hd.type;
 					u_int32 lba    =msg_recv.u.msg_hd.lba ;
@@ -43,14 +62,17 @@ void HariMain(void){
 						                 hd_identify(DRIVER,send_pid,buf);
 						                 break;
 						case HD_READ    :
+										
 						                 hd_sector_read(lba,send_pid,buf);
 										 break;
 					    case HD_WRITE   :
 						                hd_sector_write(lba,send_pid,buf);
+										break;
 						default         :
 						                awake(send_pid,FALSE);
 						                break;
 					}
+					break;
 				}
 		        default:
 					awake(send_pid,FALSE);
@@ -81,16 +103,17 @@ PRIVATE void hd_identify       (u_int32 driver,u_int32 awake_pid,u_int8*liner_bu
 PRIVATE u_int32 hd_sector_read (u_int32 lba,u_int32 awake_pid,u_int8*liner_buf){
 	assert(liner_buf!=NULL);
 	struct hd_cmd cmd;
-	cmd.features=0;
-	cmd.device  =MAKE_DEVICE_REG(LBA_MODE,0/*主硬盘0号控制器*/,/*lba高4位*/(lba&0xf000000)>>24);
+	cmd.device  =MAKE_DEVICE_REG(LBA_MODE,0/*主硬盘0号控制器*/,/*lba高4位*/(lba>>24)&0xf);
 	cmd.command =ATA_READ;
 	cmd.count   =1;/*只允许读取一个扇区*/
 	cmd.lba_low =lba&0xff;
 	cmd.lba_mid =((lba&0xff00)>>8);
 	cmd.lba_high=((lba&0xff0000)>>16);
+	hd_cmd_out(&cmd);
 	struct MESSAGE intMsg;
-	receive(&intMsg,STATUS_RECV_INT,HD_INTNO,hd_pid);/*等待硬盘中断唤醒*/
 	
+	//hd_cmd_out(&cmd);
+	receive(&intMsg,STATUS_RECV_INT,HD_INTNO,hd_pid);/*等待硬盘中断唤醒*/
 	/*读取硬盘数据*/
 	int i;
 	u_int16*buf=(u_int16*)liner_buf;
@@ -125,6 +148,7 @@ PRIVATE u_int32 hd_sector_write(u_int32 lba,u_int32 awake_pid,u_int8*liner_buf){
 }
 PRIVATE void hd_cmd_out        (struct hd_cmd* cmd          ){
 
+	while((io_in8(REG_STATUS)&STATUS_BSY)!=0 );
 	/* Activate the Interrupt Enable (nIEN) bit */
 	io_out8(REG_DEV_CTRL, 0);
 	/* Load required parameters in the Command Block Registers */

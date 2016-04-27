@@ -32,12 +32,6 @@ SOFTWARE.
 #include "F:\work\tolset\tinyOS\kernel\lib\string.h            "
 #include "F:\work\tolset\tinyOS\kernel\lib\global.h            "
 #include "F:\work\tolset\tinyOS\kernel\bootInfo\bootInfo.h     "
-#define type_NUMBER                     1
-#define type_LOWER_LETTER               2
-#define type_UPPER_LETTER               4
-#define type_SIGN                       8
-#define type_SPECIAL                    16
-#define sign_NUMBER                     10
 #define fontRect_WIDTH                  8
 #define fontRect_HEIGHT                 16
 /*数字，大小写字母，符号，符号的查找表，以及一个特殊符号（表示错误字符）*/

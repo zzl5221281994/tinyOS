@@ -25,7 +25,7 @@ SOFTWARE.
 #include "F:\work\tolset\tinyOS\kernel\graphics\font.h          "
 #include "F:\work\tolset\tinyOS\kernel\multiTask\process.h      "
 #include "F:\work\tolset\tinyOS\kernel\debug\debug.h            "
-#define SYS_CALL_NUM    9
+#define SYS_CALL_NUM    10
 extern u_int32 sys_call_table[SYS_CALL_NUM];
 extern u_int32 msg_queue_table[MAX_PROCESS];
 extern void sys_call            (                                                                );

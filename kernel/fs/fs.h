@@ -1,5 +1,5 @@
 /************************************************************************************
-Wed Apr 27 10:17:31 2016
+Wed Apr 27 10:19:58 2016
 
 MIT License
 Copyright (c) 2016 zhuzuolang
@@ -20,13 +20,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ************************************************************************************/
-#ifndef user_lib_H
-#define user_lib_H
-#include "F:\work\tolset\tinyOS\kernel\lib\global.h             "
-#include "F:\work\tolset\tinyOS\kernel\multiTask\process.h      "
-#include "F:\work\tolset\tinyOS\kernel\multiTask\message.h      "
-#include "user_sys_call.h                                       "
-extern void make_msg(struct MESSAGE *msg,u_int32 send_pid,u_int32 recv_pid,u_int32 type,u_int32 block);
-
-
+#ifndef fs_H
+#define fs_H
 #endif

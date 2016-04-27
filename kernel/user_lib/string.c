@@ -1,5 +1,5 @@
 /************************************************************************************
-Wed Apr 27 10:17:31 2016
+Wed Apr 13 15:37:28 2016
 
 MIT License
 Copyright (c) 2016 zhuzuolang
@@ -20,13 +20,49 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ************************************************************************************/
-#ifndef user_lib_H
-#define user_lib_H
-#include "F:\work\tolset\tinyOS\kernel\lib\global.h             "
-#include "F:\work\tolset\tinyOS\kernel\multiTask\process.h      "
-#include "F:\work\tolset\tinyOS\kernel\multiTask\message.h      "
-#include "user_sys_call.h                                       "
-extern void make_msg(struct MESSAGE *msg,u_int32 send_pid,u_int32 recv_pid,u_int32 type,u_int32 block);
-
-
-#endif
+#include "global.h"
+PUBLIC u_int32 strlen  (int8*str                                                   ){
+	int32 len=0;
+	while((*str)!='\0')
+	{
+		str++;
+		len++;
+	}   
+	return len;
+}
+PUBLIC void intToStr        (u_int32 num ,u_int8*  desc ,int32   bufSize				 ){
+	int32 pos=bufSize-1;
+	if(num==0)
+	{
+		desc[0]='0';
+		desc[1]='\0';
+		return;
+	}
+	while(num>0){
+		int32 current=num%10;
+		desc[pos]='0'+current;
+		pos--;
+		num=num/10;
+	}
+	pos++;
+	int32 len=0,i;
+	for(i=pos;i<=bufSize-1;i++)
+		desc[len++]=desc[i];
+	desc[len]='\0';
+}
+PUBLIC int32 memcpy8        (u_int8*  src,u_int8*  desc ,u_int32 buffSize               ){
+	u_int32 i=0;
+	if(src==NULL||desc==NULL)
+		return FALSE;
+	while((i++)<buffSize)
+		(*(desc++))=(*(src++));
+	return TRUE;
+}
+PUBLIC int32 memcpy32       (u_int32* src,u_int32* desc ,u_int32 buffSize               ){
+	u_int32 i=0;
+	if(src==NULL||desc==NULL)
+		return FALSE;
+	while((i++)<buffSize)
+		(*(desc++))=(*(src++));
+	return TRUE;
+}

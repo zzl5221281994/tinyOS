@@ -179,16 +179,17 @@ PUBLIC void IRQ13_FPU_error1                (void){
 	sendEOI_Slave  ();
 	sendEOI_Master ();
 }
+u_int32 atNum=0;
 PUBLIC void IRQ14_ATDisk1                   (void){
 	sendEOI_Slave  ();
 	sendEOI_Master ();
 	u_int8 status=io_in8(REG_STATUS);
 	/*此处应该加入对状态的错误与否来发送消息*/
 	struct MESSAGE msg;
-	struct int_msg intMsg;
+	struct INT_MSG intMsg;
 	intMsg.intNo=14;
 	intMsg.status=status;
-	make_msg(&msg,0,1,INT_MSG,BLOCK_NOT_NEED);
+	make_msg(&msg,0,1,INT_MSG_TYPE,BLOCK_NOT_NEED);
 	msg.u.msg_int=intMsg;
 	send_msg(&msg,0);
 }

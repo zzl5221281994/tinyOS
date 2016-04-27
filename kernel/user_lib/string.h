@@ -1,5 +1,5 @@
 /************************************************************************************
-Wed Apr 27 10:17:31 2016
+Wed Apr 13 15:37:28 2016
 
 MIT License
 Copyright (c) 2016 zhuzuolang
@@ -20,13 +20,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ************************************************************************************/
-#ifndef user_lib_H
-#define user_lib_H
-#include "F:\work\tolset\tinyOS\kernel\lib\global.h             "
-#include "F:\work\tolset\tinyOS\kernel\multiTask\process.h      "
-#include "F:\work\tolset\tinyOS\kernel\multiTask\message.h      "
-#include "user_sys_call.h                                       "
-extern void make_msg(struct MESSAGE *msg,u_int32 send_pid,u_int32 recv_pid,u_int32 type,u_int32 block);
-
-
+#ifndef string_H
+#define string_H
+#include "global.h"
+#define       isDigts(     X                      )     (((X)>='0'&&(X)<='9')?1:0                         )
+#define      isLetter(     X                      )     ((((X)>='a'&&(X)<='z')||((X)>='A'&&(X)<='Z'))?1:0 )
+#define isLowerLetter(     X                      )     (((X)>='a'&&(X)<='z')?1:0                         )
+#define isUpperLetter(     X                      )     (((X)>='A'&&(X)<='Z')?1:0                         )
+extern void intToStr         (u_int32  num,u_int8 *desc,    int32 bufSize					              );
+extern u_int32 strlen        (int8*str                                                                    );
+extern int32 memcpy8         (u_int8*  src,u_int8 *desc,  u_int32 buffSize                                );
+extern int32 memcpy32        (u_int32* src,u_int32*desc,  u_int32 buffSize                                );
 #endif

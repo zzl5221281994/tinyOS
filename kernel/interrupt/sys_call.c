@@ -24,6 +24,7 @@ SOFTWARE.
 #include "F:\work\tolset\tinyOS\kernel\lib\string.h             "
 #include "F:\work\tolset\tinyOS\kernel\multiTask\process.h      "
 #include "F:\work\tolset\tinyOS\kernel\multiTask\message.h      "
+#include "F:\work\tolset\tinyOS\kernel\bootInfo\bootInfo.h      "
 /*系统调用数组*/
 PUBLIC u_int32 sys_call_table[SYS_CALL_NUM];
 /*进程表的消息队列数组*/
@@ -73,7 +74,7 @@ PUBLIC u_int32 send_msg(struct MESSAGE*msg,u_int32 call_pid  ){
 			return TRUE;
 		}
 	}
-	else if(status==STATUS_RECV_INT&&send_pid==0&&msg_type==INT_MSG&&process_table[recv_pid].specify==intNo)
+	else if(status==STATUS_RECV_INT&&send_pid==0&&msg_type==INT_MSG_TYPE&&process_table[recv_pid].specify==intNo)
 	{/*如果接收进程被阻塞，并处于等待中断发生的状态*/
 		memcpy8((u_int8*)m_ptr,(u_int8*)((process_table[recv_pid].msg)),sizeof(struct MESSAGE));
 		awake(recv_pid,STATUS_RECV_INT);
@@ -91,7 +92,7 @@ PUBLIC u_int32 send_msg(struct MESSAGE*msg,u_int32 call_pid  ){
 	{/*接收进程处于未接收消息状态，将消息放入队列*/
 	    /*由于该消息并未被接收，所以发送进程应当被阻塞并执行调度程序*/
 		process_table[recv_pid].msg_queue_size++;
-		if(msg_type!=INT_MSG)/*如果消息不是中断类型，则一定是某个进程发送的*/
+		if(msg_type!=INT_MSG_TYPE)/*如果消息不是中断类型，则一定是某个进程发送的*/
 		{
 			memcpy8((u_int8*)m_ptr,(u_int8*)(&(process_table[recv_pid].msg_queue[send_pid+16])),sizeof(struct MESSAGE));
 			if(block==BLOCK_NEED)/*是否需要阻塞*/
@@ -199,10 +200,16 @@ PRIVATE u_int32 draw(u_int8* str,u_int32 key,u_int32 pid){
 	return TRUE;
 	
 }
-PRIVATE u_int32 get_pid(                               ){
+PRIVATE u_int32 get_pid        (                               ){
 	return current_exec_pid;
 }
-PRIVATE void dNum(u_int32 num,u_int32 x,u_int32 y      ){
+PRIVATE void get_screen_info   (u_int32 addr ,u_int32 pid      ){
+	u_int32*ptr=(u_int32*)l_addr2liner_addr(addr,pid,1);
+	*ptr=(u_int32)boot_info.vram;
+	*(ptr+1)=boot_info.screen_width;
+	*(ptr+2)=boot_info.screen_height;
+}
+PRIVATE void dNum             (u_int32 num,u_int32 x,u_int32 y ){
 	drawNum(num,x,y,0x1f,0x00);
 }
 //TEST
@@ -217,6 +224,7 @@ PUBLIC void init_sys_call_table (                                     ){
 	sys_call_table[6]=(u_int32)get_pid          ;
 	sys_call_table[7]=(u_int32)assertion_failure;
 	sys_call_table[8]=(u_int32)dNum             ;
+	sys_call_table[9]=(u_int32)get_screen_info  ;
 	return;
 }
 PUBLIC u_int32 l_addr2liner_addr(u_int32 addr,u_int32 pid,u_int32 type){
