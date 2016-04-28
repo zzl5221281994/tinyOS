@@ -23,7 +23,7 @@
 ; haribote-ipl
 ; TAB=4
 
-CYLS	EQU		10				
+CYLS	EQU		20				
 		ORG		0x7c00			
 		JMP		entry
 

@@ -10,16 +10,17 @@ struct screen_info{
 struct screen_info screen;
 u_int32 wd_pid;
 u_int8* vram;
-u_int8 backGround=0x2e;
-void init_screen (                                 );
+u_int8 backGround=0x1c;
+void init_screen (u_int8 byte1,u_int8 byte2,u_int8 byte3);
 void createWindow(struct WINDOW *wnd,u_int32 send_pid);
 void updateFrame (struct WINDOW *wnd,u_int32 send_pid);
+//test
+u_int32 key=0;
+//test
 void HariMain(void){
-	drawNum(1234,100,100);
 	wd_pid=get_pid();
 	get_screen_info(&screen,wd_pid);
 	vram=screen.vram;
-	init_screen();
 	while(1)
 	{
 		receive(&msg_recv,STATUS_RECV_SPECIFY,2,wd_pid);
@@ -52,11 +53,16 @@ void HariMain(void){
 		}
 	};
 }
-void init_screen(                                 ){
+void init_screen(u_int8 byte1,u_int8 byte2,u_int8 byte3){
 	int i,j;
-	for(i=0;i<screen.screen_height;i++)
-		for(j=0;j<screen.screen_width;j++)
-			*(vram+i*screen.screen_width+j)=backGround;
+	//for(i=0;i<screen.screen_height;i++)
+	//	for(j=0;j<screen.screen_width;j+=3)
+	for(j=0;j<1024*20*3;j+=3)
+		{
+			*(vram+j)=byte1;
+			*(vram+j+1)=byte2;
+			*(vram+j+2)=byte3;
+		}
 }
 void createWindow(struct WINDOW *wnd,u_int32 send_pid){
 	int i,j;

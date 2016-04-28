@@ -29,6 +29,7 @@ SOFTWARE.
 #define isUpperLetter(     X                      )     (((X)>='A'&&(X)<='Z')?1:0                         )
 extern void intToStr         (u_int32  num,u_int8 *desc,    int32 bufSize					              );
 extern u_int32 strlen        (int8*str                                                                    );
+extern u_int32 strcmp        (int8*src,int8*desc                                                          );
 extern int32 memcpy8         (u_int8*  src,u_int8 *desc,  u_int32 buffSize                                );
 extern int32 memcpy32        (u_int32* src,u_int32*desc,  u_int32 buffSize                                );
 #endif

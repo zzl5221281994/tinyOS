@@ -31,90 +31,18 @@ SOFTWARE.
 #include "drivers\hd.h         "
 #include "debug\debug.h        "
 #include "interrupt\sys_call.h "
+#define  MAX_SERVER_SIZE     20480
 PUBLIC struct bootInfo boot_info;
 PUBLIC struct main_gdt       gdt;
 PUBLIC struct main_idt       idt;
 PUBLIC u_int8  *vram8 =NULL     ;
 PUBLIC u_int32 *vram32=NULL     ;
 PUBLIC u_int32 time=0           ;
-PUBLIC u_int32 serverNum=0      ;
 //static u_int8* tinyOS_str1="\nWed Mar 30 22 50 57 2016\n\nMIT License\nCopyright c 2016 zhuzuolang\n\nPermission is hereby granted free of charge to any person obtaining a copy\nof this software and associated documentation files the Software to deal\nin the Software without restriction including without limitation the rights\nto use copy modify merge publish distribute sublicense and or sell\ncopies of the Software and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software \nTHE SOFTWARE IS PROVIDED AS IS WITHOUT WARRANTY OF ANY KIND EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY WHETHER IN AN ACTION OF CONTRACT TORT OR OTHERWISE ARISING FROM \nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE\n\nWed Mar 30 22 50 57 2016\n\nMIT License\nCopyright c 2016 zhuzuolang\n\nPermission is hereby granted free of charge to any person obtaining a copy\nof this software and associated documentation files the Software to deal\nin the Software without restriction including without limitation the rights\nto use copy modify merge publish distribute sublicense and or sell\ncopies of the Software and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software \nTHE SOFTWARE IS PROVIDED AS IS WITHOUT WARRANTY OF ANY KIND EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY WHETHER IN AN ACTION OF CONTRACT TORT OR OTHERWISE ARISING FROM \nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE\n";
 void drawInfo();
-void testA();
-void testB();
-void testC();
-/*************************************************************************************/
-/*此段硬盘相关的代码来自于硬盘驱动程序，在这儿的目的主要是加载磁盘上的第一个系统服务进程用，即磁盘驱动程序。
-因为第一个进程必须由内核加载*/
-PRIVATE void init_hd           (                               ){
-	u_int8 *ptr=0x475;//此处保存着机器上硬盘的数量
-	assert((*ptr)!=0);//确认机器存在硬盘
-	/*消息缓冲区全部无效*/
-}
-PRIVATE void hd_cmd_out        (struct hd_cmd* cmd          ){
-
-	/* Activate the Interrupt Enable (nIEN) bit */
-	io_out8(REG_DEV_CTRL, 0);
-	/* Load required parameters in the Command Block Registers */
-	io_out8(REG_FEATURES, cmd->features);
-	io_out8(REG_NSECTOR,  cmd->count);
-	io_out8(REG_LBA_LOW,  cmd->lba_low);
-	io_out8(REG_LBA_MID,  cmd->lba_mid);
-	io_out8(REG_LBA_HIGH, cmd->lba_high);
-	io_out8(REG_DEVICE,   cmd->device);
-	while(((io_in8(REG_STATUS)&STATUS_DRDY)==0));
-	while((io_in8(REG_STATUS)&STATUS_BSY)!=0);
-	/* Write the command code to the Command Register */
-	io_out8(REG_CMD,     cmd->command);
-}
-PRIVATE u_int32 hd_sector_read (u_int32 lba,u_int16*liner_buf,u_int32 pos){
-	struct hd_cmd cmd;
-	cmd.features=0;
-	cmd.device  =MAKE_DEVICE_REG(LBA_MODE,0/*主硬盘0号控制器*/,/*lba高4位*/(lba&0xf000000)>>24);
-	cmd.command =ATA_READ;
-	cmd.count   =1;/*只允许读取一个扇区*/
-	cmd.lba_low =lba&0xff;
-	cmd.lba_mid =((lba&0xff00)>>8);
-	cmd.lba_high=((lba&0xff0000)>>16);
-	hd_cmd_out(&cmd);
-	while(io_in8(REG_STATUS)&STATUS_BSY!=0);
-	while(io_in8(REG_STATUS)&STATUS_DRQ==0);
-	u_int8 byte=io_in8(REG_STATUS);
-	if(byte&STATUS_ERR!=0)
-		return 0;
-	int i;
-	for(i=0;i<10;i++)
-		io_delay();
-	for(i=0;i<256;i++)
-		liner_buf[i]=io_in16(REG_DATA);
-	return 1;
-}
-PRIVATE u_int32 hd_sector_write(u_int32 lba,u_int32 awake_pid,u_int8*liner_buf){
-	assert(liner_buf!=NULL);
-	struct hd_cmd cmd;
-	
-	cmd.features=0;
-	cmd.device  =MAKE_DEVICE_REG(LBA_MODE,0/*主硬盘0号控制器*/,/*lba高4位*/(lba&0xf000000)>>24);
-	cmd.command =ATA_WRITE;
-	cmd.count   =1;/*只允许写入一个扇区*/
-	cmd.lba_low =lba&0xff;
-	cmd.lba_mid =((lba&0xff00)>>8);
-	cmd.lba_high=((lba&0xff0000)>>16);
-	hd_cmd_out(&cmd);
-	//等待驱动器设置DRQ数据请求信号，然后写入数据
-	while((io_in8(REG_STATUS)&STATUS_DRQ)==0);
-	u_int16*buf=(u_int16*)liner_buf;
-	int i;
-	for(i=0;i<256;i++)
-		io_out16(REG_DATA,buf[i]);
-	/*数据输出完毕,等待中断唤醒*/
-	return TRUE;
-}
-
-/*************************************************************************************/
-u_int16 hd_buf[768];
-u_int16 fs_buf[1024];
-u_int16 wd_buf[512];
+u_int16 hd_buf[MAX_SERVER_SIZE/2];
+u_int16 fs_buf[MAX_SERVER_SIZE/2];
+u_int16 wd_buf[MAX_SERVER_SIZE/2];
 /*内核入口*/
 void HariMain(void)
 {
@@ -131,34 +59,17 @@ void HariMain(void)
 	init_msg_queue();
 	init_sys_call_table();
 	init_process_table();
-	init_hd();
+	u_int8*ptr=0x38940;
+	memcpy8(ptr,(u_int8*)hd_buf,MAX_SERVER_SIZE);
+	ptr=ptr+MAX_SERVER_SIZE;
+	memcpy8(ptr,(u_int8*)fs_buf,MAX_SERVER_SIZE);
+	ptr+=MAX_SERVER_SIZE;
+	memcpy8(ptr,(u_int8*)wd_buf,MAX_SERVER_SIZE);
 	
-	
-	/*hd_sector_read(0,hd_buf,0);
-	hd_sector_read(1,hd_buf+256,0);
-	hd_sector_read(2,hd_buf+512,0);
-	
-	hd_sector_read(3,fs_buf,0);
-	hd_sector_read(4,fs_buf+256,0);
-	hd_sector_read(5,fs_buf+512,0);
-	hd_sector_read(6,fs_buf+768,0);*/
-	u_int8*ptr=0x202A0;
-	memcpy8(ptr,(u_int8*)hd_buf,1536);
-	ptr=ptr+1536;
-	memcpy8(ptr,(u_int8*)fs_buf,2048);
-	ptr+=2048;
-	memcpy8(ptr,(u_int8*)wd_buf,1024);
-	
-	//int i;
-	//for(i=0;i<768;i++)
-	//	drawNum(hd_buf[i],16*((64*i)/1024),(64*i)%1024,0x3c,0x00);
-	u_int32 pid2=createServer((u_int8*)hd_buf,1536,1,1);
-	createServer((u_int8*)fs_buf,2048,1,1);
-	createServer((u_int8*)wd_buf,1024,1,1);
-	//drawInfo();
-	//drawNum(pid1,0,0,0x3c,0x00);
-	//drawNum(pid2,0,400,0x3c,0x00);
-	//drawNum(pid3,0,500,0x3c,0x00);
+	//drawNum(1234,100,100,0x3c,0x00);
+	createServer((u_int8*)hd_buf,MAX_SERVER_SIZE,1,1);
+	createServer((u_int8*)fs_buf,MAX_SERVER_SIZE,1,1);
+	createServer((u_int8*)wd_buf,MAX_SERVER_SIZE,1,1);
 	open_interrupt();
 	while(1)
 		io_hlt();

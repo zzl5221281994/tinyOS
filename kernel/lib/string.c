@@ -30,6 +30,16 @@ PUBLIC u_int32 strlen  (int8*str                                                
 	}   
 	return len;
 }
+PUBLIC u_int32 strcmp        (int8*src,int8*desc                                   ){
+	while(*(src)==*(desc))
+	{
+		if(*src=='\0')
+			return TRUE;
+		src++;
+		desc++;
+	}
+	return FALSE;
+}
 PUBLIC void intToStr        (u_int32 num ,u_int8*  desc ,int32   bufSize				 ){
 	int32 pos=bufSize-1;
 	if(num==0)
