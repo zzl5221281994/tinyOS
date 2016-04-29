@@ -39,7 +39,7 @@ PUBLIC void schedule          (                                                 
 	//test
 	kernel_mutex++;
 	schedule_num++;
-	//drawNum(current_exec_pid,(16*((schedule_num*64)/1024))%768,(schedule_num*64)%1024,0x3c,0x00);
+	drawNum(current_exec_pid,(16*((schedule_num*64)/1024))%768,(schedule_num*64)%1024,0x3c,0x00);
 	/*进程调度*/
 	process_table[current_exec_pid].current_time--;
 	

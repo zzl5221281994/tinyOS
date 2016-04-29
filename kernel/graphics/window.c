@@ -21,6 +21,43 @@ void HariMain(void){
 	wd_pid=get_pid();
 	get_screen_info(&screen,wd_pid);
 	vram=screen.vram;
+	//test
+	/*struct FILE_MSG file_msg;
+	file_msg.type=FILE_OPEN;
+	int8*name="haribote.sys";
+	file_msg.file_name=name;
+	make_msg(&msg_send,wd_pid,2,FILE_MSG_TYPE,BLOCK_NEED);
+	msg_send.u.msg_file=file_msg;
+	u_int32 handle=send(&msg_send,wd_pid);
+	drawNum(handle,500,500);
+	
+	
+	
+	
+	struct I_NODE inode;
+	file_msg.type=FILE_IDENTIFY;
+	file_msg.handle=6;
+	file_msg.inode=&inode;
+	make_msg(&msg_send,wd_pid,2,FILE_MSG_TYPE,BLOCK_NEED);
+	msg_send.u.msg_file=file_msg;
+	send(&msg_send,wd_pid);
+	
+	draw(inode.file_name,0,wd_pid);
+	drawNum(inode.byte_size,100,0);
+	drawNum(inode.startSector,100,100);
+	drawNum(inode.sectorNum,100,200);
+	drawNum(inode.status,100,300);
+	
+	
+	file_msg.type=POWER_OFF;
+	file_msg.handle=handle;
+	msg_send.u.msg_file=file_msg;
+	send(&msg_send,wd_pid);
+	file_msg.type=POWER_OFF;
+	file_msg.handle=handle;
+	msg_send.u.msg_file=file_msg;
+	send(&msg_send,wd_pid);*/
+	//test
 	while(1)
 	{
 		receive(&msg_recv,STATUS_RECV_SPECIFY,2,wd_pid);

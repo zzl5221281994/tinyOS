@@ -26,21 +26,30 @@ struct HD_INFO{
 /***************************************************************************************/
 
 /*文件消息结构*/
+#define MAX_FILE_NAME 20
 #define FILE_IDENTIFY 1
 #define FILE_OPEN     2
 #define FILE_READ     3
 #define FILE_WRITE    4
 #define FILE_CREATE   5
 #define FILE_DELETE   6
+#define POWER_OFF     7
+
+struct I_NODE{/*一个iNode代表一个文件*/
+	int8 file_name[MAX_FILE_NAME];
+	u_int32 byte_size  ;
+	u_int32 startSector;
+	u_int32 sectorNum  ;
+	u_int32 status     ;
+	u_int32 flags      ;
+};
 struct FILE_MSG{
 	u_int32 type;
 	u_int32 buf_len;
-	int8*file_name;
-	void*buf;
-	
-};
-/*文件系统信息结构*/
-struct FILE_SYS_INFO{
+	u_int32 handle ;
+	int8*file_name ;
+	void*buf       ;
+	struct I_NODE*inode;
 	
 };
 /***************************************************************************************/
