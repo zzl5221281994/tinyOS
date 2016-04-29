@@ -51,7 +51,7 @@ _loadReg:
 		MOV		EDI,[ESP+48]
 		ADD		ESP,4
 		DEC		DWORD[_kernel_mutex]
-		;加载DS寄存器，由于加载后会改变数据段，因此放在IRETD前
+		;加载DS寄存器，由于加载后会改变数据段，因此放在上面这段代码之后
 		PUSH	EAX
 		MOV		EAX,[ESP+52];DS
 		MOV		DS,AX
