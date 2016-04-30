@@ -153,10 +153,6 @@ _IRQ1_keyBoard:
 		MOV		AX,selectorKernelData
 		MOV		DS,AX
 		POP		EAX
-		;CMP		DWORD[_kernel_mutex],0
-		;JNE     L1_1
-		;该段代码在每一个中断前都存在
-	;L1_1:
      	INC		DWORD[_kernel_mutex]
 		PUSHAD
 		STI
@@ -234,10 +230,6 @@ _IRQ12_PS2Mouse:
 		MOV		AX,selectorKernelData
 		MOV		DS,AX
 		POP		EAX
-		;CMP		DWORD[_kernel_mutex],0
-		;JNE     L12_1
-		;该段代码在每一个中断前都存在
-       ; L12_1:
 		INC		DWORD[_kernel_mutex]
 		PUSHAD
 		STI
@@ -249,9 +241,6 @@ _IRQ12_PS2Mouse:
 		PUSH	EAX
 		CMP		DWORD[_kernel_mutex],0
 		JNE     L12_2
-		;MOV		EAX,DWORD[_serverNum]
-		;CMP		DWORD[_current_exec_pid],EAX
-		;JBE	    L12_2
 		MOV		AX,selectorUserData
 		MOV		DS,AX
 		;该段代码在每一个中断前都存在

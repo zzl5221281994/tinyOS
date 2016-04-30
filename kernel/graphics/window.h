@@ -1,5 +1,5 @@
 /************************************************************************************
-Tue Apr 19 10:29:59 2016
+Sat Apr 30 11:41:26 2016
 
 MIT License
 Copyright (c) 2016 zhuzuolang
@@ -20,9 +20,25 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ************************************************************************************/
-#include "IO.h"
-int8 keyBoard_inPut_buf[MAX_KEYBOARD_BUF+1];
-u_int8 mouse_inPut_buf[MAX_MOUSE_BUF+1]    ;
-u_int32 keyBoard_bufLen=0                  ;
-u_int32 mouse_write_pos=0                  ;
-u_int32 mouse_read_pos=0                   ;
+#ifndef window_H
+#define window_H
+#include "F:\work\tolset\tinyOS\kernel\user_lib\user_lib.h        "
+#define KEYBOARD   1
+#define MOUSE      12
+struct MESSAGE msg_send;
+struct MESSAGE msg_recv;
+struct screen_info{
+	u_int8* vram;
+	u_int32 screen_width;
+	u_int32 screen_height;
+};
+struct buffer_info{
+	u_int8*keyBoardBuffer;
+	u_int8*mouseBuffer;
+};
+extern void mouse_proc   (u_int8*buffer,u_int32 pos          );
+extern void keyBoard_proc(u_int8*buffer,u_int32 pos          );
+extern void init_screen  (                                   );
+extern void createWindow (struct WINDOW *wnd,u_int32 send_pid);
+extern void updateFrame  (struct WINDOW *wnd,u_int32 send_pid);
+#endif

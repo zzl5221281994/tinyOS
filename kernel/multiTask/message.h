@@ -4,7 +4,8 @@
 /*系统服务固定pid*/
 #define HD_DRIVER 1
 #define FILE_SYS  2
-#define SYSTEM    3
+#define WD_SYS    3
+#define SYSTEM    4
 /***************************************************************************************/
 //硬盘消息结构
 #define HD_READ           1

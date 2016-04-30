@@ -30,9 +30,11 @@ SOFTWARE.
 #include "F:\work\tolset\tinyOS\kernel\multiTask\message.h   "
 #include "F:\work\tolset\tinyOS\kernel\drivers\hd.h          "
 #include "interrupt.h                                        "
+#include "sys_call.h                                         "
 #define EXCEPTION_HANDERS_NUM 20
 #define INTERRUPT_HANDERS_NUM 16
 #define DEFAULT_ERRORCODE     8888
+
 //全局锁,允许除了时钟中断外的所有中断和系统调用嵌套重入
 PUBLIC u_int32 kernel_mutex=0;
 //CPU exception
@@ -108,7 +110,12 @@ PRIVATE void SIMD_exception                 (void){
 
 //PIC interrupt
 // master 8259A
-//EAX,ECX,EDX,EBX,ESP,EBP,ESI和EDI
+//#define HD_DRIVER 1
+//#define FILE_SYS  2
+//#define WINDOW    3
+//#define SYSTEM    4
+
+
 PUBLIC void IRQ0_clock1                     (void){
 	global_clock++;
 	process_table[current_exec_pid].status=STATUS_NO_TIME;
@@ -123,8 +130,8 @@ PUBLIC void IRQ1_keyBoard1                  (void){
 		keyBoard_bufLen=0;
 	keyBoard_inPut_buf[keyBoard_bufLen]='\0';
 	//test
-	drawNum(keyBoard_bufLen,0,0,0x3c,0x00);
-   // drawStr(keyBoard_inPut_buf,200,0,0x3c,0x00);
+	//drawNum(keyBoard_bufLen,0,0,0x3c,0x00);
+  // drawStr(keyBoard_inPut_buf,200,0,0x3c,0x00);
 }
 PUBLIC void IRQ2_slave1                     (void){
 	sendEOI_Master ();
@@ -161,25 +168,61 @@ PUBLIC void IRQ11_reserved21                (void){
 	sendEOI_Slave  ();
 	sendEOI_Master ();
 }
+/*标记鼠标状态*/
+u_int32 mousePhase=0;
 PUBLIC void IRQ12_PS2Mouse1                 (void){
 	u_int8 byte=io_in8(0x60);
 	sendEOI_Slave  ();
 	sendEOI_Master ();
-	mouse_inPut_buf[mouse_bufLen++]=byte;
-	if(mouse_bufLen>MAX_MOUSE_BUF)
-		mouse_bufLen=0;
-	mouse_inPut_buf[mouse_bufLen]='\0';
+	if(mousePhase==0)
+	{
+		mousePhase=1;
+		return;
+	}
+	if(mousePhase==1)/*循环缓冲区*/
+	{
+		mouse_inPut_buf[mouse_write_pos++]=byte;
+		mousePhase=2;
+		if(mouse_write_pos==MAX_MOUSE_BUF)
+			mouse_write_pos=0;
+		return;
+	}
+	if(mousePhase==2)
+	{
+		mouse_inPut_buf[mouse_write_pos++]=byte;
+		mousePhase=3;
+		if(mouse_write_pos==MAX_MOUSE_BUF)
+			mouse_write_pos=0;
+		return;
+	}
+	if(mousePhase==3)
+	{
+		mouse_inPut_buf[mouse_write_pos++]=byte;
+		mousePhase=1;
+		if(mouse_write_pos==MAX_MOUSE_BUF)
+			mouse_write_pos=0;
+	/*收满3字节，向WINDOW服务发送鼠标移动消息*/
+	struct MESSAGE msg;
+	struct INT_MSG intMsg;
+	intMsg.intNo=12;
+	intMsg.status=mouse_read_pos;
+	make_msg(&msg,0,3,INT_MSG_TYPE,BLOCK_NOT_NEED);
+	msg.u.msg_int=intMsg;
+	send_msg(&msg,0);
+	mouse_read_pos+=3;
+	mouse_read_pos=mouse_read_pos%MAX_MOUSE_BUF;
+	return;
+	}
 	//test
-	//drawNum(mouse_bufLen,0,1024-100,0x3c,0x00);
 	//int i;
-	//for(i=0;i<mouse_bufLen;i++)
-	//	drawNum(mouse_inPut_buf[i],300+16*((i*30)/1024),(i*30)%1024,0x3c,0x00);
+	//for(i=0;i<mouse_write_pos;i++)
+	//	drawNum(mouse_inPut_buf[i],16*((32*i)/1024),(i*32)%1024,0x3c,0x00);
+	
 }
 PUBLIC void IRQ13_FPU_error1                (void){
 	sendEOI_Slave  ();
 	sendEOI_Master ();
 }
-u_int32 atNum=0;
 PUBLIC void IRQ14_ATDisk1                   (void){
 	sendEOI_Slave  ();
 	sendEOI_Master ();
@@ -189,7 +232,7 @@ PUBLIC void IRQ14_ATDisk1                   (void){
 	struct INT_MSG intMsg;
 	intMsg.intNo=14;
 	intMsg.status=status;
-	make_msg(&msg,0,1,INT_MSG_TYPE,BLOCK_NOT_NEED);
+	make_msg(&msg,0,HD_DRIVER,INT_MSG_TYPE,BLOCK_NOT_NEED);
 	msg.u.msg_int=intMsg;
 	send_msg(&msg,0);
 }
@@ -238,4 +281,5 @@ PUBLIC u_int32 interrupt_hander[INTERRUPT_HANDERS_NUM]={
 													   (u_int32)IRQ13_FPU_error,
 													   (u_int32)IRQ14_ATDisk,
 													   (u_int32)IRQ15_reserved3};
+													   
 													   

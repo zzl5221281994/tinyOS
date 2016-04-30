@@ -25,11 +25,11 @@ SOFTWARE.
 #include "F:\work\tolset\tinyOS\kernel\lib\global.h             "
 #define MAX_KEYBOARD_BUF 100
 #define MAX_MOUSE_BUF    200
-#define MAX_HD_MSG        20
 //键盘数据缓冲区
 extern int8 keyBoard_inPut_buf[];
 extern u_int32 keyBoard_bufLen  ;
 //鼠标数据缓冲区
 extern u_int8 mouse_inPut_buf[] ;
-extern u_int32 mouse_bufLen     ;
+extern u_int32 mouse_write_pos  ;
+extern u_int32 mouse_read_pos   ;
 #endif

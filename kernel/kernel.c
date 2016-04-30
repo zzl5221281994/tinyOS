@@ -43,6 +43,7 @@ void drawInfo();
 u_int16 hd_buf[MAX_SERVER_SIZE/2];
 u_int16 fs_buf[MAX_SERVER_SIZE/2];
 u_int16 wd_buf[MAX_SERVER_SIZE/2];
+u_int16 df_buf[MAX_SERVER_SIZE/2];
 /*内核入口*/
 void HariMain(void)
 {
@@ -54,7 +55,7 @@ void HariMain(void)
 	init_8259A(); 
     init_keyboard();
     init_mouse();	
-	init_pit(100);                    //设置每秒时钟中断次数
+	init_pit(300);                    //设置每秒时钟中断次数
 	init_tss();	
 	init_msg_queue();
 	init_sys_call_table();
@@ -65,11 +66,14 @@ void HariMain(void)
 	memcpy8(ptr,(u_int8*)fs_buf,MAX_SERVER_SIZE);
 	ptr+=MAX_SERVER_SIZE;
 	memcpy8(ptr,(u_int8*)wd_buf,MAX_SERVER_SIZE);
+	ptr+=MAX_SERVER_SIZE;
+	memcpy8(ptr,(u_int8*)df_buf,MAX_SERVER_SIZE);
 	
 	//drawNum(1234,100,100,0x3c,0x00);
 	createServer((u_int8*)hd_buf,MAX_SERVER_SIZE,1,1);
 	createServer((u_int8*)fs_buf,MAX_SERVER_SIZE,1,1);
 	createServer((u_int8*)wd_buf,MAX_SERVER_SIZE,1,1);
+	createServer((u_int8*)df_buf,MAX_SERVER_SIZE,1,1);
 	open_interrupt();
 	while(1)
 		io_hlt();

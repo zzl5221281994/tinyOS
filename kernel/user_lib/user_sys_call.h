@@ -47,5 +47,5 @@ extern u_int32 transTolinerAddr(u_int32 addr,u_int32 pid,u_int32 type           
 																	                                     type=2,±Ì æ∂—’ª∂Œ*/
 extern u_int32 get_pid         (                                                                        );
 extern void get_screen_info    ( u_int32 addr,u_int32 pid                                               );
-																										 
+extern void get_buffer_info    ( u_int32 addr,u_int32 pid                                               );																										 
 #endif

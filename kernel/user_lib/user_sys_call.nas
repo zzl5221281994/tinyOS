@@ -37,7 +37,29 @@
 		GLOBAL  _assertion_failure
 		GLOBAL  _drawNum
 		GLOBAL  _get_screen_info
+		GLOBAL  _get_buffer_info
 [SECTION .text]
+_get_buffer_info:
+		PUSH	EBP
+		MOV		EBP,ESP	
+		
+		PUSH	EBX
+		PUSH	ECX
+		PUSH	EDX
+		PUSH	ESI
+		;系统调用参数
+		MOV		EAX,40
+		MOV		EBX,[EBP+8]
+		MOV		ECX,[EBP+12]
+		INT 	0X88
+		;EAX中有返回值
+		POP		ESI
+		POP		EDX
+		POP		ECX
+		POP		EBX
+		
+		POP		EBP
+		RET
 _get_screen_info:
 		PUSH	EBP
 		MOV		EBP,ESP	

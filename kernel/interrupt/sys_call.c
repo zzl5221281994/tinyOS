@@ -25,6 +25,7 @@ SOFTWARE.
 #include "F:\work\tolset\tinyOS\kernel\multiTask\process.h      "
 #include "F:\work\tolset\tinyOS\kernel\multiTask\message.h      "
 #include "F:\work\tolset\tinyOS\kernel\bootInfo\bootInfo.h      "
+#include "F:\work\tolset\tinyOS\kernel\IO\IO.h                  "
 /*系统调用数组*/
 PUBLIC u_int32 sys_call_table[SYS_CALL_NUM];
 /*进程表的消息队列数组*/
@@ -209,6 +210,12 @@ PRIVATE void get_screen_info   (u_int32 addr ,u_int32 pid      ){
 	*(ptr+1)=boot_info.screen_width;
 	*(ptr+2)=boot_info.screen_height;
 }
+PRIVATE void get_buffer_info   (u_int32 addr ,u_int32 pid      ){
+	u_int32*ptr=(u_int32*)l_addr2liner_addr(addr,pid,1);
+	*(ptr+0)=keyBoard_inPut_buf;
+	*(ptr+1)=mouse_inPut_buf;
+}
+
 PRIVATE void dNum             (u_int32 num,u_int32 x,u_int32 y ){
 	drawNum(num,x,y,0x1f,0x00);
 }
@@ -225,6 +232,7 @@ PUBLIC void init_sys_call_table (                                     ){
 	sys_call_table[7]=(u_int32)assertion_failure;
 	sys_call_table[8]=(u_int32)dNum             ;
 	sys_call_table[9]=(u_int32)get_screen_info  ;
+	sys_call_table[10]=(u_int32)get_buffer_info ;
 	return;
 }
 PUBLIC u_int32 l_addr2liner_addr(u_int32 addr,u_int32 pid,u_int32 type){
